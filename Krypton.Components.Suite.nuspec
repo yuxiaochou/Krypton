@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Krypton.Components.Suite</id>
+    <version>$version$</version>
+    <title>Krypton.Components.Suite</title>
+    <authors>megakraken</authors>
+    <owners>megakraken</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/megakraken/Krypton/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/megakraken/Krypton</projectUrl>
+    <description>Krypton Suite of .NET WinForms Controls</description>
+    <summary>Krypton Suite of .NET WinForms Controls</summary>
+    <releaseNotes></releaseNotes>
+    <copyright>ComponentFactory</copyright>
+    <tags>Krypton, ComponentFactory, WinForms</tags>
+  </metadata>
+  <files>
+    <file src="bin\ComponentFactory.Krypton.Design.dll" target="lib\net20\ComponentFactory.Krypton.Design.dll" />
+    <file src="bin\ComponentFactory.Krypton.Docking.dll" target="lib\net20\ComponentFactory.Krypton.Docking.dll" />
+    <file src="bin\ComponentFactory.Krypton.Navigator.dll" target="lib\net20\ComponentFactory.Krypton.Navigator.dll" />
+    <file src="bin\ComponentFactory.Krypton.Ribbon.dll" target="lib\net20\ComponentFactory.Krypton.Ribbon.dll" />
+    <file src="bin\ComponentFactory.Krypton.Toolkit.dll" target="lib\net20\ComponentFactory.Krypton.Toolkit.dll" />
+    <file src="bin\ComponentFactory.Krypton.Workspace.dll" target="lib\net20\ComponentFactory.Krypton.Workspace.dll" />
+  </files>
+</package>
