@@ -47,3 +47,4 @@ packages/
 bin/
 .vs/
 *.csproj.user
+*.nupkg
