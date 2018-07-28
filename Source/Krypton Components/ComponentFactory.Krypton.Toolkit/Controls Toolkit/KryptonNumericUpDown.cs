@@ -18,6 +18,7 @@ using System.ComponentModel.Design;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace ComponentFactory.Krypton.Toolkit
 {
@@ -71,6 +72,33 @@ namespace ComponentFactory.Krypton.Toolkit
 
                 // We provide the border manually
                 BorderStyle = BorderStyle.None;
+
+                AllowDecimals = true;
+                DecimalPlaces = 99;
+            }
+            #endregion
+
+            #region Public
+            /// <summary>
+            /// Gets or sets whether the control accepts decimal values.
+            /// </summary>
+            [Category("Behavior")]
+            [Description("Indicates whether the control can accept decimal values, rather than integer values only.")]
+            [DefaultValue(true)]
+            public bool AllowDecimals {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// Gets or sets whether the control displays trailing zeroes.
+            /// </summary>
+            [Category("Behavior")]
+            [Description("Indicates whether the control will display traling zeroes.")]
+            [DefaultValue(false)]
+            public bool TrailingZeroes {
+                get;
+                set;
             }
             #endregion
 
@@ -100,6 +128,26 @@ namespace ComponentFactory.Krypton.Toolkit
             #endregion
 
             #region Protected
+            /// <summary>
+            /// This is a really ugly hack but it gets the job done.
+            /// </summary>
+            protected override void UpdateEditText() {
+                if (!AllowDecimals && (long)Value != Value) {
+                    Value = (long)Value;
+                }
+                if (!Hexadecimal && !TrailingZeroes) {
+                    Text = Value.ToString("0.##############################");
+                } else {
+                    base.UpdateEditText();
+                }
+            }
+
+            protected override void OnKeyPress(KeyPressEventArgs e) {
+                base.OnKeyPress(e);
+                e.Handled = !AllowDecimals && e.KeyChar.ToString() ==
+                    CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator;
+            }
+
             /// <summary>
             /// Process Windows-based messages.
             /// </summary>
@@ -1085,10 +1133,33 @@ namespace ComponentFactory.Krypton.Toolkit
         [Category("Data")]
         [Description("Indicates the number of decimal places to display.")]
         [DefaultValue(0)]
+        [Browsable(false)]
         public int DecimalPlaces
         {
-            get { return _numericUpDown.DecimalPlaces; }
-            set { _numericUpDown.DecimalPlaces = value; }
+            get;/* { return _numericUpDown.DecimalPlaces; }*/
+            set;/* { _numericUpDown.DecimalPlaces = value; }*/
+        }
+
+        /// <summary>
+        /// Gets or sets whether the control accepts decimal values.
+        /// </summary>
+        [Category("Behavior")]
+        [Description("Indicates whether the control can accept decimal values, rather than integer values only.")]
+        [DefaultValue(true)]
+        public bool AllowDecimals {
+            get { return _numericUpDown.AllowDecimals; }
+            set { _numericUpDown.AllowDecimals = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the control displays trailing zeroes.
+        /// </summary>
+        [Category("Behavior")]
+        [Description("Indicates whether the control will display traling zeroes.")]
+        [DefaultValue(false)]
+        public bool TrailingZeroes {
+            get { return _numericUpDown.TrailingZeroes; }
+            set { _numericUpDown.TrailingZeroes = value; }
         }
 
         /// <summary>

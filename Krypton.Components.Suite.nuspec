@@ -7,8 +7,9 @@
     <authors>megakraken</authors>
     <owners>megakraken</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <licenseUrl>https://github.com/megakraken/Krypton/blob/master/LICENSE</licenseUrl>
+    <licenseUrl>https://github.com/megakraken/Krypton/blob/dev/LICENSE</licenseUrl>
     <projectUrl>https://github.com/megakraken/Krypton</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/megakraken/Krypton/dev/Images/icon.png</iconUrl>
     <description>Krypton Suite of .NET WinForms Controls</description>
     <summary>Krypton Suite of .NET WinForms Controls</summary>
     <releaseNotes></releaseNotes>

@@ -2691,6 +2691,81 @@ namespace ComponentFactory.Krypton.Toolkit
         }
 
         /// <summary>
+        /// Replicates the AllowDecimals property of the KryptonDataGridViewNumericUpDownCell cell type.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(true)]
+        [Description("Indicates whether the control can accept decimal values, rather than integer values only.")]
+        public bool AllowDecimals {
+            get {
+                if (NumericUpDownCellTemplate == null)
+                    throw new InvalidOperationException("Operation cannot be completed because this DataGridViewColumn does not have a CellTemplate.");
+                return NumericUpDownCellTemplate.AllowDecimals;
+            }
+            set {
+                if (NumericUpDownCellTemplate == null)
+                    throw new InvalidOperationException("Operation cannot be completed because this DataGridViewColumn does not have a CellTemplate.");
+
+                // Update the template cell so that subsequent cloned cells use the new value.
+                NumericUpDownCellTemplate.AllowDecimals = value;
+                if (DataGridView != null) {
+                    // Update all the existing KryptonDataGridViewNumericUpDownCell cells in the column accordingly.
+                    DataGridViewRowCollection dataGridViewRows = DataGridView.Rows;
+                    int rowCount = dataGridViewRows.Count;
+                    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                        // Be careful not to unshare rows unnecessarily. 
+                        // This could have severe performance repercussions.
+                        DataGridViewRow dataGridViewRow = dataGridViewRows.SharedRow(rowIndex);
+                        KryptonDataGridViewNumericUpDownCell dataGridViewCell = dataGridViewRow.Cells[Index] as KryptonDataGridViewNumericUpDownCell;
+                        if (dataGridViewCell != null)
+                            dataGridViewCell.SetAllowDecimals(rowIndex, value);
+                    }
+
+                    DataGridView.InvalidateColumn(Index);
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Replicates the TrailingZeroes property of the KryptonDataGridViewNumericUpDownCell cell type.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(false)]
+        [Description("Indicates whether the control will display traling zeroes.")]
+        public bool TrailingZeroes {
+            get {
+                if (NumericUpDownCellTemplate == null)
+                    throw new InvalidOperationException("Operation cannot be completed because this DataGridViewColumn does not have a CellTemplate.");
+                return NumericUpDownCellTemplate.TrailingZeroes;
+            }
+            set {
+                if (NumericUpDownCellTemplate == null)
+                    throw new InvalidOperationException("Operation cannot be completed because this DataGridViewColumn does not have a CellTemplate.");
+
+                // Update the template cell so that subsequent cloned cells use the new value.
+                NumericUpDownCellTemplate.TrailingZeroes = value;
+                if (DataGridView != null) {
+                    // Update all the existing KryptonDataGridViewNumericUpDownCell cells in the column accordingly.
+                    DataGridViewRowCollection dataGridViewRows = DataGridView.Rows;
+                    int rowCount = dataGridViewRows.Count;
+                    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                        // Be careful not to unshare rows unnecessarily. 
+                        // This could have severe performance repercussions.
+                        DataGridViewRow dataGridViewRow = dataGridViewRows.SharedRow(rowIndex);
+                        KryptonDataGridViewNumericUpDownCell dataGridViewCell = dataGridViewRow.Cells[Index] as KryptonDataGridViewNumericUpDownCell;
+                        if (dataGridViewCell != null)
+                            dataGridViewCell.SetTrailingZeroes(rowIndex, value);
+                    }
+
+                    DataGridView.InvalidateColumn(Index);
+                }
+
+            }
+        }
+
+
+        /// <summary>
         /// Replicates the DecimalPlaces property of the KryptonDataGridViewNumericUpDownCell cell type.
         /// </summary>
         [Category("Appearance")]
@@ -2983,6 +3058,8 @@ namespace ComponentFactory.Krypton.Toolkit
         private Decimal _maximum;
         private bool _thousandsSeparator;
         private bool _hexadecimal;
+        private bool _allowDecimals;
+        private bool _trailingZeroes;
         #endregion
 
         #region Identity
@@ -3028,6 +3105,34 @@ namespace ComponentFactory.Krypton.Toolkit
         public override Type EditType
         {
             get { return _defaultEditType; }
+        }
+
+        /// <summary>
+        /// The AllowDecimals property replicates the one from the KryptonNumericUpDown control
+        /// </summary>
+        [DefaultValue(true)]
+        public bool AllowDecimals {
+            get { return _allowDecimals; }
+            set {
+                if(_allowDecimals != value) {
+                    SetAllowDecimals(RowIndex, value);
+                    OnCommonChange();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The TrailingZeroes property replicates the one from the KryptonNumericUpDown control
+        /// </summary>
+        [DefaultValue(false)]
+        public bool TrailingZeroes {
+            get { return _trailingZeroes; }
+            set {
+                if(_trailingZeroes != value) {
+                    SetTrailingZeroes(RowIndex, value);
+                    OnCommonChange();
+                }
+            }
         }
 
         /// <summary>
@@ -3166,6 +3271,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 dataGridViewCell.Minimum = Minimum;
                 dataGridViewCell.ThousandsSeparator = ThousandsSeparator;
                 dataGridViewCell.Hexadecimal = Hexadecimal;
+                dataGridViewCell.AllowDecimals = AllowDecimals;
+                dataGridViewCell.TrailingZeroes = TrailingZeroes;
             }
             return dataGridViewCell;
         }
@@ -3328,10 +3435,13 @@ namespace ComponentFactory.Krypton.Toolkit
                 Decimal formattedDecimal = System.Convert.ToDecimal(formattedNumber);
                 if (unformattedDecimal == formattedDecimal)
                 {
-                    // The base implementation of GetFormattedValue (which triggers the CellFormatting event) did nothing else than 
-                    // the typical 1234.5 to "1234.5" conversion. But depending on the values of ThousandsSeparator and DecimalPlaces,
-                    // this may not be the actual string displayed. The real formatted value may be "1,234.500"
-                    return formattedDecimal.ToString((ThousandsSeparator ? "N" : "F") + DecimalPlaces.ToString());
+                    if (!Hexadecimal && !TrailingZeroes)
+                        return formattedDecimal.ToString("0.##############################");
+
+                        // The base implementation of GetFormattedValue (which triggers the CellFormatting event) did nothing else than 
+                        // the typical 1234.5 to "1234.5" conversion. But depending on the values of ThousandsSeparator and DecimalPlaces,
+                        // this may not be the actual string displayed. The real formatted value may be "1,234.500"
+                        return formattedDecimal.ToString((ThousandsSeparator ? "N" : "F") + DecimalPlaces.ToString());
                 }
             }
             return formattedValue;
@@ -3433,6 +3543,18 @@ namespace ComponentFactory.Krypton.Toolkit
         #endregion
 
         #region Internal
+        internal void SetAllowDecimals(int rowIndex, bool value) {
+            _allowDecimals = value;
+            if (OwnsEditingNumericUpDown(rowIndex))
+                EditingNumericUpDown.AllowDecimals = value;
+        }
+
+        internal void SetTrailingZeroes(int rowIndex, bool value) {
+            _trailingZeroes = value;
+            if (OwnsEditingNumericUpDown(rowIndex))
+                EditingNumericUpDown.TrailingZeroes = value;
+        }
+
         internal void SetDecimalPlaces(int rowIndex, int value)
         {
             _decimalPlaces = value;
