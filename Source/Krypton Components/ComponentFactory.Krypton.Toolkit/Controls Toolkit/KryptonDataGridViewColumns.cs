@@ -101,14 +101,77 @@ namespace ComponentFactory.Krypton.Toolkit
     }
 
     /// <summary>
+    /// Icon specification that can be assigned to DataGridViewColumns.
+    /// </summary>
+    public class IconSpec : ICloneable {
+        /// <summary>
+        /// Alignment options for icons.
+        /// </summary>
+        public enum IconAlignment {
+            /// <summary>
+            /// Right-Alignment.
+            /// </summary>
+            Right,
+            /// <summary>
+            /// Left-Alignment.
+            /// </summary>
+            Left
+        };
+
+        /// <summary>
+        /// Gets or sets the icon to display.
+        /// </summary>
+        public Image Icon {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the alignment of the icon.
+        /// </summary>
+        public IconAlignment Alignment {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Clones this instance of the IconSpec class.
+        /// </summary>
+        /// <returns>
+        /// A cloned instance.
+        /// </returns>
+        public object Clone() {
+            var spec = new IconSpec {};
+            spec.Icon = Icon?.Clone() as Image;
+            spec.Alignment = Alignment;
+            return spec;
+        }
+    }
+
+    /// <summary>
+    /// An interface that is implemented by KryptonDataGridViewColumn classes that support
+    /// column header icons.
+    /// </summary>
+    public interface IIconColumn {
+        /// <summary>
+        /// Gets the list of icon specifications.
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        List<IconSpec> IconSpecs {
+            get;
+        }
+    }
+
+    /// <summary>
     /// Hosts a collection of KryptonDataGridViewTextBoxCell cells.
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonTextBoxColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewTextBoxColumn), "ToolboxBitmaps.KryptonTextBox.bmp")]
-    public class KryptonDataGridViewTextBoxColumn : DataGridViewColumn
+    public class KryptonDataGridViewTextBoxColumn : DataGridViewColumn, IIconColumn
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
+        private List<IconSpec> _iconSpecs;
         #endregion
 
         #region Events
@@ -126,6 +189,7 @@ namespace ComponentFactory.Krypton.Toolkit
             : base(new KryptonDataGridViewTextBoxCell())
         {
             _buttonSpecs = new DataGridViewColumnSpecCollection(this);
+            _iconSpecs = new List<IconSpec>();
             SortMode = DataGridViewColumnSortMode.Automatic;
         }
 
@@ -155,7 +219,8 @@ namespace ComponentFactory.Krypton.Toolkit
             // Move the button specs over to the new clone
             foreach (ButtonSpec bs in ButtonSpecs)
                 cloned.ButtonSpecs.Add(bs.Clone());
-
+            foreach (IconSpec sp in IconSpecs)
+                cloned.IconSpecs.Add(sp.Clone() as IconSpec);
             return cloned;
         }
 
@@ -246,6 +311,16 @@ namespace ComponentFactory.Krypton.Toolkit
         public DataGridViewColumnSpecCollection ButtonSpecs
         {
             get { return _buttonSpecs; }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
         #endregion
 
@@ -771,8 +846,12 @@ namespace ComponentFactory.Krypton.Toolkit
     /// Hosts a collection of KryptonDataGridViewCheckBoxCell cells.
     /// </summary>
     [ToolboxBitmap(typeof(KryptonDataGridViewCheckBoxColumn), "ToolboxBitmaps.KryptonCheckBox.bmp")]
-    public class KryptonDataGridViewCheckBoxColumn : DataGridViewColumn
+    public class KryptonDataGridViewCheckBoxColumn : DataGridViewColumn, IIconColumn
     {
+        #region Instance Fields
+        private List<IconSpec> _iconSpecs;
+        #endregion
+
         #region Implementation
         /// <summary>
         /// Initialize a new instance of the KryptonDataGridViewCheckBoxColumn class.
@@ -780,6 +859,7 @@ namespace ComponentFactory.Krypton.Toolkit
         public KryptonDataGridViewCheckBoxColumn()
             : this(false)
         {
+            _iconSpecs = new List<IconSpec>();
         }
 
         /// <summary>
@@ -831,6 +911,16 @@ namespace ComponentFactory.Krypton.Toolkit
 
                 base.CellTemplate = value;
             }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
 
         /// <summary>
@@ -1317,8 +1407,12 @@ namespace ComponentFactory.Krypton.Toolkit
     /// Hosts a collection of KryptonDataGridViewButtonCell cells.
     /// </summary>
     [ToolboxBitmap(typeof(KryptonDataGridViewButtonColumn), "ToolboxBitmaps.KryptonButton.bmp")]
-    public class KryptonDataGridViewButtonColumn : DataGridViewColumn
+    public class KryptonDataGridViewButtonColumn : DataGridViewColumn, IIconColumn
     {
+        #region Instance Fields
+        private List<IconSpec> _iconSpecs;
+        #endregion
+
         #region Static Fields
         private MethodInfo _miColumnCommonChange;
         private PropertyInfo _piUseColumnTextForButtonValueInternal;
@@ -1335,6 +1429,7 @@ namespace ComponentFactory.Krypton.Toolkit
         public KryptonDataGridViewButtonColumn()
             : base(new KryptonDataGridViewButtonCell())
         {
+            _iconSpecs = new List<IconSpec>();
             DataGridViewCellStyle style = new DataGridViewCellStyle();
             style.Alignment = DataGridViewContentAlignment.MiddleCenter;
             DefaultCellStyle = style;
@@ -1397,7 +1492,17 @@ namespace ComponentFactory.Krypton.Toolkit
             get { return base.DefaultCellStyle; }
             set { base.DefaultCellStyle = value; }
         }
-        
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
+        }
+
         /// <summary>
         /// Gets or sets the default text displayed on the button cell.
         /// </summary>
@@ -1924,7 +2029,7 @@ namespace ComponentFactory.Krypton.Toolkit
     /// Hosts a collection of KryptonDataGridViewLinkColumn cells.
     /// </summary>
     [ToolboxBitmap(typeof(KryptonDataGridViewLinkColumn), "ToolboxBitmaps.KryptonLinkLabel.bmp")]
-    public class KryptonDataGridViewLinkColumn : DataGridViewColumn
+    public class KryptonDataGridViewLinkColumn : DataGridViewColumn, IIconColumn
     {
         #region Static Fields
         private MethodInfo _miColumnCommonChange;
@@ -1935,6 +2040,7 @@ namespace ComponentFactory.Krypton.Toolkit
         #region Instance Fields
         private string _text;
         private LabelStyle _labelStyle;
+        private List<IconSpec> _iconSpecs;
         #endregion
 
         #region Identity
@@ -1946,6 +2052,7 @@ namespace ComponentFactory.Krypton.Toolkit
         {
             // Define defaults
             _labelStyle = LabelStyle.NormalControl;
+            _iconSpecs = new List<IconSpec>();
         }
 
         /// <summary>
@@ -1994,6 +2101,16 @@ namespace ComponentFactory.Krypton.Toolkit
 
                 base.CellTemplate = value;
             }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
 
         /// <summary>
@@ -2607,10 +2724,11 @@ namespace ComponentFactory.Krypton.Toolkit
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonNumericUpDownColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewNumericUpDownColumn), "ToolboxBitmaps.KryptonNumericUpDown.bmp")]
-    public class KryptonDataGridViewNumericUpDownColumn : DataGridViewColumn
+    public class KryptonDataGridViewNumericUpDownColumn : DataGridViewColumn, IIconColumn
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
+        private List<IconSpec> _iconSpecs;
         #endregion
 
         #region Events
@@ -2628,6 +2746,7 @@ namespace ComponentFactory.Krypton.Toolkit
             : base(new KryptonDataGridViewNumericUpDownCell())
         {
             _buttonSpecs = new DataGridViewColumnSpecCollection(this);
+            _iconSpecs = new List<IconSpec>();
         }
 
         /// <summary>
@@ -2688,6 +2807,16 @@ namespace ComponentFactory.Krypton.Toolkit
         public DataGridViewColumnSpecCollection ButtonSpecs
         {
             get { return _buttonSpecs; }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
 
         /// <summary>
@@ -3911,10 +4040,11 @@ namespace ComponentFactory.Krypton.Toolkit
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonDomainUpDownColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewDomainUpDownColumn), "ToolboxBitmaps.KryptonDomainUpDown.bmp")]
-    public class KryptonDataGridViewDomainUpDownColumn : DataGridViewColumn
+    public class KryptonDataGridViewDomainUpDownColumn : DataGridViewColumn, IIconColumn
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
+        private List<IconSpec> _iconSpecs;
         private StringCollection _items;
         #endregion
 
@@ -3933,6 +4063,7 @@ namespace ComponentFactory.Krypton.Toolkit
             : base(new KryptonDataGridViewDomainUpDownCell())
         {
             _buttonSpecs = new DataGridViewColumnSpecCollection(this);
+            _iconSpecs = new List<IconSpec>();
             _items = new StringCollection();
         }
 
@@ -4001,6 +4132,16 @@ namespace ComponentFactory.Krypton.Toolkit
         public DataGridViewColumnSpecCollection ButtonSpecs
         {
             get { return _buttonSpecs; }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
 
         /// <summary>
@@ -4542,12 +4683,13 @@ namespace ComponentFactory.Krypton.Toolkit
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonComboBoxColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewComboBoxColumn), "ToolboxBitmaps.KryptonComboBox.bmp")]
-    public class KryptonDataGridViewComboBoxColumn : DataGridViewColumn
+    public class KryptonDataGridViewComboBoxColumn : DataGridViewColumn, IIconColumn
     {
         #region Instance Fields
         private StringCollection _items;
         private AutoCompleteStringCollection _autoCompleteCustom;
         private DataGridViewColumnSpecCollection _buttonSpecs;
+        private List<IconSpec> _iconSpecs;
         #endregion
 
         #region Events
@@ -4565,6 +4707,7 @@ namespace ComponentFactory.Krypton.Toolkit
             : base(new KryptonDataGridViewComboBoxCell())
         {
             _buttonSpecs = new DataGridViewColumnSpecCollection(this);
+            _iconSpecs = new List<IconSpec>();
             _items = new StringCollection();
             _autoCompleteCustom = new AutoCompleteStringCollection();
         }
@@ -4643,6 +4786,16 @@ namespace ComponentFactory.Krypton.Toolkit
         public DataGridViewColumnSpecCollection ButtonSpecs
         {
             get { return _buttonSpecs; }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
 
         /// <summary>
@@ -5704,10 +5857,11 @@ namespace ComponentFactory.Krypton.Toolkit
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonDateTimePickerColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewDateTimePickerColumn), "ToolboxBitmaps.KryptonDateTimePicker.bmp")]
-    public class KryptonDataGridViewDateTimePickerColumn : DataGridViewColumn
+    public class KryptonDataGridViewDateTimePickerColumn : DataGridViewColumn, IIconColumn
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
+        private List<IconSpec> _iconSpecs;
         private DateTimeList _annualDates;
         private DateTimeList _monthlyDates;
         private DateTimeList _dates;
@@ -5728,6 +5882,7 @@ namespace ComponentFactory.Krypton.Toolkit
             : base(new KryptonDataGridViewDateTimePickerCell())
         {
             _buttonSpecs = new DataGridViewColumnSpecCollection(this);
+            _iconSpecs = new List<IconSpec>();
             _annualDates = new DateTimeList();
             _monthlyDates = new DateTimeList();
             _dates = new DateTimeList();
@@ -5796,6 +5951,16 @@ namespace ComponentFactory.Krypton.Toolkit
         public DataGridViewColumnSpecCollection ButtonSpecs
         {
             get { return _buttonSpecs; }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
 
         /// <summary>
@@ -7763,10 +7928,11 @@ namespace ComponentFactory.Krypton.Toolkit
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonMaskedTextBoxColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewMaskedTextBoxColumn), "ToolboxBitmaps.KryptonMaskedTextBox.bmp")]
-    public class KryptonDataGridViewMaskedTextBoxColumn : DataGridViewColumn
+    public class KryptonDataGridViewMaskedTextBoxColumn : DataGridViewColumn, IIconColumn
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
+        private List<IconSpec> _iconSpecs;
         #endregion
 
         #region Events
@@ -7784,6 +7950,7 @@ namespace ComponentFactory.Krypton.Toolkit
             : base(new KryptonDataGridViewMaskedTextBoxCell())
         {
             _buttonSpecs = new DataGridViewColumnSpecCollection(this);
+            _iconSpecs = new List<IconSpec>();
         }
 
         /// <summary>
@@ -7844,6 +8011,16 @@ namespace ComponentFactory.Krypton.Toolkit
         public DataGridViewColumnSpecCollection ButtonSpecs
         {
             get { return _buttonSpecs; }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
 
         /// <summary>
