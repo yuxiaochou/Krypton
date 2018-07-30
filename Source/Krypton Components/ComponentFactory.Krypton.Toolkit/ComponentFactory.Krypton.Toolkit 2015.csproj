@@ -115,6 +115,9 @@
     <Compile Include="Controls Toolkit\KryptonInputBox.cs" />
     <Compile Include="Controls Toolkit\KryptonTaskDialogCommand.cs" />
     <Compile Include="Controls Toolkit\KryptonTaskDialog.cs" />
+    <Compile Include="Controls Visuals\MultilineStringEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Controls Visuals\VisualTaskDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -861,6 +864,7 @@
     <None Include="Resources\help2Small.png" />
     <None Include="Resources\informationSmall.png" />
     <None Include="Resources\sign_warningSmall.png" />
+    <None Include="Resources\SelectParentControlFlipped.png" />
     <Content Include="Resources\SilverDropDownButton.png" />
     <None Include="Resources\WhitePendantRibbonMinimize.bmp" />
     <None Include="Resources\WhitePendantRibbonExpand.bmp" />

@@ -334,6 +334,8 @@ namespace ComponentFactory.Krypton.Toolkit
         private bool _allowButtonSpecToolTips;
         private bool _trackingMouseEnter;
         private int _cachedHeight;
+        private bool _multilineStringEditor;
+        private ButtonSpecAny _editorButton;
         #endregion
 
         #region Events
@@ -502,6 +504,13 @@ namespace ComponentFactory.Krypton.Toolkit
             _toolTipManager.CancelToolTip += new EventHandler(OnCancelToolTip);
             _buttonManager.ToolTipManager = _toolTipManager;
 
+            // Create the button spec for the multiline editor button.
+            _editorButton = new ButtonSpecAny();
+            _editorButton.Image = Properties.Resources.SelectParentControlFlipped;
+            _editorButton.Style = PaletteButtonStyle.ButtonSpec;
+            _editorButton.Type = PaletteButtonSpecStyle.Generic;
+            _editorButton.Click += new EventHandler(OnEditorButtonClicked);
+
             // Add text box to the controls collection
             ((KryptonReadOnlyControls)Controls).AddInternal(_textBox);
         }
@@ -545,6 +554,21 @@ namespace ComponentFactory.Krypton.Toolkit
         {
             get { return _inRibbonDesignMode; }
             set { _inRibbonDesignMode = value; }
+        }
+
+        /// <summary>
+        /// Gets and sets if the control uses the multiline string editor widget.
+        /// </summary>
+        [Category("Behavior")]
+        [Description("Indicates if the control uses the multiline string editor widget.")]
+        [DefaultValue(false)]
+        public bool MultilineStringEditor {
+            get { return _multilineStringEditor; }
+            set {
+                if (_multilineStringEditor != value) {
+                    SetMultilineStringEditor(value);
+                }
+            }
         }
 
         /// <summary>
@@ -1451,6 +1475,26 @@ namespace ComponentFactory.Krypton.Toolkit
                 _forcedLayout = false;
             }
         }
+
+        /// <summary>
+        /// Sets up the multiline string editor for the control.
+        /// </summary>
+        /// <param name="value">
+        /// true to enable the multiline string editor; otherwise false.
+        /// </param>
+        protected void SetMultilineStringEditor(bool value) {
+            _multilineStringEditor = value;
+            // FIXME: This should probably rather be drawn as a glyph or something and not be
+            // added to the ButtonSpecs that can be modified by the user, but I lack the
+            // familiarity with the Krypton Framework and the time to figure out how to implement
+            // this the proper way.
+            if(value == false) {
+                ButtonSpecs.Remove(_editorButton);
+            } else {
+                if(!ButtonSpecs.Contains(_editorButton))
+                    ButtonSpecs.Add(_editorButton);
+            }
+        }
         #endregion
 
         #region Protected Virtual
@@ -2060,6 +2104,10 @@ namespace ComponentFactory.Krypton.Toolkit
                 else
                     OnTrackMouseLeave(EventArgs.Empty);
             }
+        }
+
+        private void OnEditorButtonClicked(object sender, EventArgs e) {
+            new MultilineStringEditor(this).ShowEditor();
         }
         #endregion
     }

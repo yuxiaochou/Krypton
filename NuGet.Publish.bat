@@ -4,3 +4,4 @@ set /p last=<last_version
 set /p version="Version (ex. 4.5.0): "
 nuget.exe pack Krypton.Components.Suite.nuspec -Version %version%
 nuget.exe push Krypton.Components.Suite.%version%.nupkg
+@echo %version% > last_version
