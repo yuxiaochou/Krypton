@@ -77,7 +77,6 @@ namespace ComponentFactory.Krypton.Toolkit {
         private int displayLinesCount;
         private int linesCount;
         private DisplayMode displayMode;
-        private DisplayMode realDisplayMode;
         #endregion
 
         #region Identity
@@ -94,7 +93,6 @@ namespace ComponentFactory.Krypton.Toolkit {
             InitUI();
             ResumeLayout();
             displayMode = DisplayMode.Hexdump;
-            realDisplayMode = DisplayMode.Hexdump;
             DoubleBuffered = true;
             SetStyle(ControlStyles.ResizeRedraw, value: true);
             SetBytes(new byte[] { });
@@ -102,212 +100,6 @@ namespace ComponentFactory.Krypton.Toolkit {
         #endregion
 
         #region Private
-        private static int AnalizeByteOrderMark(byte[] buffer, int index) {
-            int c = (buffer[index + 0] << 8) | buffer[index + 1];
-            int c2 = (buffer[index + 2] << 8) | buffer[index + 3];
-            int encodingIndex = GetEncodingIndex(c);
-            int encodingIndex2 = GetEncodingIndex(c2);
-            int[,] array = new int[13, 13]
-            {
-            {
-                1,
-                5,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-            },
-            {
-                1,
-                1,
-                1,
-                11,
-                1,
-                10,
-                4,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-            },
-            {
-                2,
-                9,
-                5,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2
-            },
-            {
-                3,
-                7,
-                3,
-                7,
-                3,
-                3,
-                3,
-                3,
-                3,
-                3,
-                3,
-                3,
-                3
-            },
-            {
-                14,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-            },
-            {
-                1,
-                6,
-                1,
-                1,
-                1,
-                1,
-                1,
-                3,
-                1,
-                1,
-                1,
-                1,
-                1
-            },
-            {
-                1,
-                8,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                2,
-                1,
-                1,
-                1,
-                1
-            },
-            {
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-            },
-            {
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-            },
-            {
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                13,
-                1,
-                1
-            },
-            {
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-            },
-            {
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                12
-            },
-            {
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-            }
-            };
-            return array[encodingIndex, encodingIndex2];
-        }
-
         private int CellToIndex(int column, int row) {
             return row * columnCount + column;
         }
@@ -393,92 +185,6 @@ namespace ComponentFactory.Krypton.Toolkit {
                 DrawAddress(g, startLine, i);
                 DrawHex(g, lineBuffer, i);
                 DrawDump(g, lineBuffer, i);
-            }
-        }
-
-        private DisplayMode GetAutoDisplayMode() {
-            int num = 0;
-            int num2 = 0;
-            if (dataBuf != null && (dataBuf.Length < 0 || dataBuf.Length >= 8)) {
-                switch (AnalizeByteOrderMark(dataBuf, 0)) {
-                    case 2:
-                        return DisplayMode.Hexdump;
-                    case 3:
-                        return DisplayMode.Unicode;
-                    case 4:
-                    case 5:
-                        return DisplayMode.Hexdump;
-                    case 6:
-                    case 7:
-                        return DisplayMode.Hexdump;
-                    case 8:
-                    case 9:
-                        return DisplayMode.Hexdump;
-                    case 10:
-                    case 11:
-                        return DisplayMode.Hexdump;
-                    case 12:
-                        return DisplayMode.Hexdump;
-                    case 13:
-                        return DisplayMode.Ansi;
-                    case 14:
-                        return DisplayMode.Ansi;
-                    default: {
-                            int num3 = (dataBuf.Length <= 1024) ? (dataBuf.Length / 2) : 512;
-                            for (int i = 0; i < num3; i++) {
-                                char c = (char)dataBuf[i];
-                                if (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)) {
-                                    num++;
-                                }
-                            }
-                            for (int j = 0; j < num3; j += 2) {
-                                char[] array = new char[1];
-                                Encoding.Unicode.GetChars(dataBuf, j, 2, array, 0);
-                                if (CharIsPrintable(array[0])) {
-                                    num2++;
-                                }
-                            }
-                            if (num2 * 100 / (num3 / 2) > 80) {
-                                return DisplayMode.Unicode;
-                            }
-                            if (num * 100 / num3 > 80) {
-                                return DisplayMode.Ansi;
-                            }
-                            return DisplayMode.Hexdump;
-                        }
-                }
-            }
-            return DisplayMode.Hexdump;
-        }
-
-        private static int GetEncodingIndex(int c1) {
-            switch (c1) {
-                case 0:
-                    return 1;
-                case 65279:
-                    return 2;
-                case 65534:
-                    return 3;
-                case 61371:
-                    return 4;
-                case 15360:
-                    return 5;
-                case 60:
-                    return 6;
-                case 16128:
-                    return 7;
-                case 63:
-                    return 8;
-                case 15423:
-                    return 9;
-                case 30829:
-                    return 10;
-                case 19567:
-                    return 11;
-                case 42900:
-                    return 12;
-                default:
-                    return 0;
             }
         }
 
@@ -609,7 +315,7 @@ namespace ComponentFactory.Krypton.Toolkit {
             base.OnPaint(e);
             Graphics graphics = e.Graphics;
             graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            switch (realDisplayMode) {
+            switch (displayMode) {
                 case DisplayMode.Hexdump:
                     SuspendLayout();
                     edit.Hide();
@@ -721,8 +427,7 @@ namespace ComponentFactory.Krypton.Toolkit {
                 throw new InvalidEnumArgumentException("mode", (int)mode, typeof(DisplayMode));
             }
             displayMode = mode;
-            realDisplayMode = ((mode == DisplayMode.Auto) ? GetAutoDisplayMode() : mode);
-            switch (realDisplayMode) {
+            switch (displayMode) {
                 case DisplayMode.Ansi:
                     InitAnsi();
                     SuspendLayout();
@@ -739,6 +444,8 @@ namespace ComponentFactory.Krypton.Toolkit {
                     ResumeLayout();
                     Invalidate();
                     break;
+                // Auto detection doesn't really work well, so just default to hexdump mode.
+                case DisplayMode.Auto:
                 case DisplayMode.Hexdump:
                     SuspendLayout();
                     edit.Hide();

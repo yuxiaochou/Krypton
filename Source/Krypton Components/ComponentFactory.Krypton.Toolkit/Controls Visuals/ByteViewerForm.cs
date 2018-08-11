@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.IO;
 using System.Windows.Forms;
 
 namespace ComponentFactory.Krypton.Toolkit {
@@ -57,19 +58,34 @@ namespace ComponentFactory.Krypton.Toolkit {
                 case "ANSI":
                     mode = DisplayMode.Ansi;
                     break;
-                case "Hex":
-                    mode = DisplayMode.Hexdump;
-                    break;
                 case "Unicode":
                     mode = DisplayMode.Unicode;
                     break;
+                case "Hex":
                 default:
-                    mode = DisplayMode.Auto;
+                    mode = DisplayMode.Hexdump;
                     break;
             }
             // Sets the display mode.
             if(byteViewer != null && byteViewer.GetDisplayMode() != mode)
                 byteViewer.SetDisplayMode(mode);
+        }
+
+        private void OnClickExport(object sender, EventArgs e) {
+            var sfd = new SaveFileDialog() {
+                CheckFileExists = false,
+                CheckPathExists = false,
+                Filter = "All Files (*.*)|*.*"
+            };
+            if (sfd.ShowDialog(this) == DialogResult.OK) {
+                var bytes = Tag as byte[];
+                if (bytes != null) {
+                    File.WriteAllBytes(sfd.FileName, bytes);
+                    // FIXME: string literal.
+                    KryptonMessageBox.Show($"Data exported to {sfd.FileName}", "Data Export",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
         }
 
         /// <summary>
@@ -84,8 +100,8 @@ namespace ComponentFactory.Krypton.Toolkit {
             KryptonCheckButton unicodeButton;
             KryptonCheckButton hexButton;
             KryptonCheckButton ansiButton;
-            KryptonCheckButton autoButton;
             KryptonCheckSet displayModeCheckset;
+            KryptonButton export;
             byteViewer = new KryptonByteViewer();
             bottomPanel = new KryptonPanel();
             topPanel = new KryptonPanel();
@@ -93,8 +109,8 @@ namespace ComponentFactory.Krypton.Toolkit {
             unicodeButton = new KryptonCheckButton();
             hexButton = new KryptonCheckButton();
             ansiButton = new KryptonCheckButton();
-            autoButton = new KryptonCheckButton();
             displayModeCheckset = new KryptonCheckSet(components);
+            export = new KryptonButton();
             ((ISupportInitialize)(topPanel)).BeginInit();
             topPanel.SuspendLayout();
             ((ISupportInitialize)(groupBox)).BeginInit();
@@ -109,6 +125,7 @@ namespace ComponentFactory.Krypton.Toolkit {
             // 
             topPanel.AutoSize = true;
             topPanel.Controls.Add(groupBox);
+            topPanel.Controls.Add(export);
             topPanel.Dock = DockStyle.Top;
             topPanel.Location = new System.Drawing.Point(0, 0);
             topPanel.Name = "topPanel";
@@ -127,14 +144,13 @@ namespace ComponentFactory.Krypton.Toolkit {
             groupBox.Panel.Controls.Add(unicodeButton);
             groupBox.Panel.Controls.Add(hexButton);
             groupBox.Panel.Controls.Add(ansiButton);
-            groupBox.Panel.Controls.Add(autoButton);
             groupBox.Size = new System.Drawing.Size(280, 57);
             groupBox.TabIndex = 0;
             groupBox.Values.Heading = "Display Mode";
             // 
             // unicodeButton
             // 
-            unicodeButton.Location = new System.Drawing.Point(210, 3);
+            unicodeButton.Location = new System.Drawing.Point(141, 3);
             unicodeButton.Name = "unicodeButton";
             unicodeButton.Size = new System.Drawing.Size(63, 25);
             unicodeButton.TabIndex = 3;
@@ -142,7 +158,8 @@ namespace ComponentFactory.Krypton.Toolkit {
             // 
             // hexButton
             // 
-            hexButton.Location = new System.Drawing.Point(141, 3);
+            hexButton.Checked = true;
+            hexButton.Location = new System.Drawing.Point(3, 3);
             hexButton.Name = "hexButton";
             hexButton.Size = new System.Drawing.Size(63, 25);
             hexButton.TabIndex = 2;
@@ -156,23 +173,22 @@ namespace ComponentFactory.Krypton.Toolkit {
             ansiButton.TabIndex = 1;
             ansiButton.Values.Text = "ANSI";
             // 
-            // autoButton
-            // 
-            autoButton.Checked = true;
-            autoButton.Location = new System.Drawing.Point(3, 3);
-            autoButton.Name = "autoButton";
-            autoButton.Size = new System.Drawing.Size(63, 25);
-            autoButton.TabIndex = 0;
-            autoButton.Values.Text = "Auto";
-            // 
             // displayModeCheckset
             // 
-            displayModeCheckset.CheckButtons.Add(autoButton);
             displayModeCheckset.CheckButtons.Add(ansiButton);
             displayModeCheckset.CheckButtons.Add(hexButton);
             displayModeCheckset.CheckButtons.Add(unicodeButton);
-            displayModeCheckset.CheckedButton = autoButton;
+            displayModeCheckset.CheckedButton = hexButton;
             displayModeCheckset.CheckedButtonChanged += new EventHandler(OnCheckedButtonChanged);
+            // 
+            // export
+            // 
+            export.Location = new System.Drawing.Point(535, 22);
+            export.Name = "export";
+            export.Size = new System.Drawing.Size(80, 25);
+            export.TabIndex = 4;
+            export.Values.Text = "Export...";
+            export.Click += new EventHandler(OnClickExport);
             // 
             // bottomPanel
             // 
@@ -197,7 +213,7 @@ namespace ComponentFactory.Krypton.Toolkit {
             Controls.Add(topPanel);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             StartPosition = FormStartPosition.CenterParent;
-            Name = "Form1";
+            Name = "Binary Viewer";
             Text = "Binary Viewer";
             ((ISupportInitialize)(topPanel)).EndInit();
             topPanel.ResumeLayout(false);
