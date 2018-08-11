@@ -64,6 +64,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
@@ -110,11 +111,17 @@
     <Compile Include="Controller\MenuLinkLabelController.cs" />
     <Compile Include="Controller\MenuItemController.cs" />
     <Compile Include="Controller\RadioButtonController.cs" />
+    <Compile Include="Controls Toolkit\KryptonByteViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls Toolkit\KryptonTreeNode.cs" />
     <Compile Include="Controls Toolkit\KryptonTreeView.cs" />
     <Compile Include="Controls Toolkit\KryptonInputBox.cs" />
     <Compile Include="Controls Toolkit\KryptonTaskDialogCommand.cs" />
     <Compile Include="Controls Toolkit\KryptonTaskDialog.cs" />
+    <Compile Include="Controls Visuals\ByteViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Controls Visuals\MultilineStringEditor.cs">
       <SubType>Form</SubType>
     </Compile>

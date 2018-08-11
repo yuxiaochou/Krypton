@@ -958,35 +958,32 @@ namespace ComponentFactory.Krypton.Toolkit
         #endregion
     }
 
-    /// CUSTOM TEST START
-
     /// <summary>
-    /// Hosts a collection of KryptonDataGridViewCustomCell cells.
+    /// Hosts a collection of KryptonDataGridViewBinaryCell cells.
     /// </summary>
-    [Designer("ComponentFactory.Krypton.Toolkit.KryptonCustomColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
-    [ToolboxBitmap(typeof(KryptonDataGridViewCustomColumn), "ToolboxBitmaps.KryptonTextBox.bmp")]
-    public class KryptonDataGridViewCustomColumn : DataGridViewColumn, IIconColumn {
-        #region Instance Fields
-        private DataGridViewColumnSpecCollection _buttonSpecs;
-        private List<IconSpec> _iconSpecs;
+    [ToolboxBitmap(typeof(KryptonDataGridViewBinaryColumn), "ToolboxBitmaps.KryptonTextBox.bmp")]
+    public class KryptonDataGridViewBinaryColumn : DataGridViewColumn, IIconColumn {
+        #region Static Fields
+        private static readonly Font _defaultFont = new Font("Consolas", 9.75f);
         #endregion
 
-        #region Events
-        /// <summary>
-        /// Occurs when the user clicks a button spec.
-        /// </summary>
-        public event EventHandler<DataGridViewButtonSpecClickEventArgs> ButtonSpecClick;
+        #region Instance Fields
+        private List<IconSpec> _iconSpecs;
+        private Type _editorType;
         #endregion
 
         #region Identity
         /// <summary>
-        /// Initialize a new instance of the KryptonDataGridViewCustomColumn class.
+        /// Initialize a new instance of the KryptonDataGridViewBinaryColumn class.
         /// </summary>
-        public KryptonDataGridViewCustomColumn()
-            : base(new KryptonDataGridViewCustomCell()) {
-            _buttonSpecs = new DataGridViewColumnSpecCollection(this);
-            _iconSpecs = new List<IconSpec>();
+        public KryptonDataGridViewBinaryColumn()
+            : base(new KryptonDataGridViewBinaryCell())
+        {
             SortMode = DataGridViewColumnSortMode.Automatic;
+            DefaultCellStyle = new DataGridViewCellStyle() {
+                Font = _defaultFont
+            };
+            _iconSpecs = new List<IconSpec>();
         }
 
         /// <summary>
@@ -995,7 +992,7 @@ namespace ComponentFactory.Krypton.Toolkit
         /// <returns>A String that represents the current Object.</returns>
         public override string ToString() {
             StringBuilder builder = new StringBuilder(0x40);
-            builder.Append("KryptonDataGridViewCustomColumn { Name=");
+            builder.Append("KryptonDataGridViewBinaryColumn { Name=");
             builder.Append(base.Name);
             builder.Append(", Index=");
             builder.Append(base.Index.ToString(CultureInfo.CurrentCulture));
@@ -1008,13 +1005,10 @@ namespace ComponentFactory.Krypton.Toolkit
         /// </summary>
         /// <returns></returns>
         public override object Clone() {
-            KryptonDataGridViewCustomColumn cloned = base.Clone() as KryptonDataGridViewCustomColumn;
-
-            // Move the button specs over to the new clone
-            foreach (ButtonSpec bs in ButtonSpecs)
-                cloned.ButtonSpecs.Add(bs.Clone());
+            KryptonDataGridViewBinaryColumn cloned = base.Clone() as KryptonDataGridViewBinaryColumn;
             foreach (IconSpec sp in IconSpecs)
                 cloned.IconSpecs.Add(sp.Clone() as IconSpec);
+            cloned._editorType = _editorType;
             return cloned;
         }
 
@@ -1025,41 +1019,11 @@ namespace ComponentFactory.Krypton.Toolkit
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
-
             base.Dispose(disposing);
         }
         #endregion
 
         #region Public
-        /// <summary>
-        /// Gets or sets the maximum number of characters that can be entered into the text box.
-        /// </summary>
-        [Category("Behavior")]
-        [DefaultValue(typeof(int), "32767")]
-        public int MaxInputLength {
-            get {
-                if (TextBoxCellTemplate == null)
-                    throw new InvalidOperationException("KryptonDataGridViewCustomColumn cell template required");
-
-                return TextBoxCellTemplate.MaxInputLength;
-            }
-
-            set {
-                if (MaxInputLength != value) {
-                    TextBoxCellTemplate.MaxInputLength = value;
-                    if (DataGridView != null) {
-                        DataGridViewRowCollection rows = DataGridView.Rows;
-                        int count = rows.Count;
-                        for (int i = 0; i < count; i++) {
-                            DataGridViewTextBoxCell cell = rows.SharedRow(i).Cells[Index] as DataGridViewTextBoxCell;
-                            if (cell != null)
-                                cell.MaxInputLength = value;
-                        }
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Gets or sets the sort mode for the column.
         /// </summary>
@@ -1076,23 +1040,12 @@ namespace ComponentFactory.Krypton.Toolkit
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override DataGridViewCell CellTemplate {
             get { return base.CellTemplate; }
-
             set {
-                if ((value != null) && !(value is KryptonDataGridViewCustomCell))
-                    throw new InvalidCastException("Can only assign a object of type KryptonDataGridViewCustomCell");
+                if ((value != null) && !(value is KryptonDataGridViewBinaryCell))
+                    throw new InvalidCastException("Can only assign a object of type KryptonDataGridViewBinaryCell");
 
                 base.CellTemplate = value;
             }
-        }
-
-        /// <summary>
-        /// Gets the collection of the button specifications.
-        /// </summary>
-        [Category("Data")]
-        [Description("Set of extra button specs to appear with control.")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public DataGridViewColumnSpecCollection ButtonSpecs {
-            get { return _buttonSpecs; }
         }
 
         /// <summary>
@@ -1104,54 +1057,71 @@ namespace ComponentFactory.Krypton.Toolkit
         public List<IconSpec> IconSpecs {
             get { return _iconSpecs; }
         }
-        #endregion
 
-        #region Private
-        private KryptonDataGridViewCustomCell TextBoxCellTemplate {
-            get { return (KryptonDataGridViewCustomCell)CellTemplate; }
+        /// <summary>
+        /// Replicates the EditorType property of the KryptonDataGridViewBinaryCell cell type.
+        /// </summary>
+        [Category("Data")]
+        [DefaultValue(null)]
+        [Description("The type of the editor widget to bring up when editing a cell's content.")]
+        public Type EditorType {
+            get {
+                if (BinaryCellTemplate == null)
+                    throw new InvalidOperationException("Operation cannot be completed because this DataGridViewColumn does not have a CellTemplate.");
+                return BinaryCellTemplate.EditorType;
+            }
+            set {
+                if (BinaryCellTemplate == null)
+                    throw new InvalidOperationException("Operation cannot be completed because this DataGridViewColumn does not have a CellTemplate.");
+                BinaryCellTemplate.EditorType = value;
+                if (DataGridView != null) {
+                    DataGridViewRowCollection dataGridViewRows = DataGridView.Rows;
+                    int rowCount = dataGridViewRows.Count;
+                    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                        DataGridViewRow dataGridViewRow = dataGridViewRows.SharedRow(rowIndex);
+                        KryptonDataGridViewBinaryCell dataGridViewCell = dataGridViewRow.Cells[Index] as KryptonDataGridViewBinaryCell;
+                        if (dataGridViewCell != null)
+                            dataGridViewCell.SetEditorType(rowIndex, value);
+                    }
+                    DataGridView.InvalidateColumn(Index);
+                }
+            }
         }
         #endregion
 
-        #region Internal
-        internal void PerfomButtonSpecClick(DataGridViewButtonSpecClickEventArgs args) {
-            if (ButtonSpecClick != null)
-                ButtonSpecClick(this, args);
+        #region Private
+        private KryptonDataGridViewBinaryCell BinaryCellTemplate {
+            get { return (KryptonDataGridViewBinaryCell)CellTemplate; }
         }
         #endregion
     }
 
     /// <summary>
-    /// Displays editable text information in a KryptonDataGridView control.
+    /// Displays viewable binary information in a KryptonDataGridView control.
     /// </summary>
-    public class KryptonDataGridViewCustomCell : DataGridViewTextBoxCell {
-        #region Static Fields
-        [ThreadStatic]
-        private static KryptonTextBox _paintingTextBox;
-        private static readonly Type _defaultEditType = typeof(KryptonDataGridViewCustomEditingControl);
-        private static readonly Type _defaultValueType = typeof(System.String);
-        private static readonly Size _sizeLarge = new Size(10000, 10000);
+    public class KryptonDataGridViewBinaryCell : KryptonDataGridViewTextBoxCell {
+        #region Instance Fields
+        private static Type defaultValueType = typeof(object);
+        private Type _editorType;
         #endregion
 
         #region Identity
         /// <summary>
-        /// Constructor for the KryptonDataGridViewCustomCell cell type
-        /// </summary>
-        public KryptonDataGridViewCustomCell() {
-            // Create a thread specific KryptonTextBox control used for the painting of the non-edited cells
-            if (_paintingTextBox == null) {
-                _paintingTextBox = new KryptonTextBox();
-                _paintingTextBox.StateCommon.Border.Width = 0;
-                _paintingTextBox.StateCommon.Border.Draw = InheritBool.False;
-                _paintingTextBox.StateCommon.Back.Color1 = Color.Empty;
-            }
-        }
-
-        /// <summary>
         /// Returns a standard textual representation of the cell.
         /// </summary>
         public override string ToString() {
-            return "KryptonDataGridViewCustomCell { ColumnIndex=" + ColumnIndex.ToString(CultureInfo.CurrentCulture) +
+            return "KryptonDataGridViewBinaryCell { ColumnIndex=" + ColumnIndex.ToString(CultureInfo.CurrentCulture) +
                    ", RowIndex=" + RowIndex.ToString(CultureInfo.CurrentCulture) + " }";
+        }
+
+        /// <summary>
+        /// Creates an exact copy of this cell.
+        /// </summary>
+        /// <returns></returns>
+        public override object Clone() {
+            KryptonDataGridViewBinaryCell cloned = base.Clone() as KryptonDataGridViewBinaryCell;
+            cloned._editorType = _editorType;
+            return cloned;
         }
 
         /// <summary>
@@ -1161,7 +1131,6 @@ namespace ComponentFactory.Krypton.Toolkit
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
-
             base.Dispose(disposing);
         }
         #endregion
@@ -1171,7 +1140,9 @@ namespace ComponentFactory.Krypton.Toolkit
         /// Define the type of the cell's editing control
         /// </summary>
         public override Type EditType {
-            get { return _defaultEditType; }
+            get {
+                return null;
+            }
         }
 
         /// <summary>
@@ -1180,169 +1151,75 @@ namespace ComponentFactory.Krypton.Toolkit
         public override Type ValueType {
             get {
                 Type valueType = base.ValueType;
-
-                if (valueType != null)
+                if (valueType != null) {
                     return valueType;
-
-                return _defaultValueType;
+                }
+                return defaultValueType;
             }
         }
 
         /// <summary>
-        /// DetachEditingControl gets called by the DataGridView control when the editing session is ending
+        /// Gets or sets the type of the editor-widget to use. If this is null, the default editor
+        /// will be used-
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public override void DetachEditingControl() {
-            DataGridView dataGridView = DataGridView;
-            if (dataGridView == null || dataGridView.EditingControl == null)
-                throw new InvalidOperationException("Cell is detached or its grid has no editing control.");
-
-            KryptonTextBox kryptonTextBox = dataGridView.EditingControl as KryptonTextBox;
-            if (kryptonTextBox != null) {
-                KryptonDataGridViewCustomColumn customColumn = OwningColumn as KryptonDataGridViewCustomColumn;
-                if (customColumn != null) {
-                    foreach (ButtonSpec bs in kryptonTextBox.ButtonSpecs)
-                        bs.Click -= new EventHandler(OnButtonClick);
-
-                    //kryptonTextBox.ButtonSpecs.Clear();
-
-                    TextBox textBox = kryptonTextBox.Controls[0] as TextBox;
-                    if (textBox != null)
-                        textBox.ClearUndo();
+        public Type EditorType {
+            get { return _editorType; }
+            set {
+                if (_editorType != value) {
+                    if (value != null && !value.IsSubclassOf(typeof(Form)))
+                        throw new InvalidOperationException("The assigned type must inherit from System.Windows.Forms.Form");
+                    SetEditorType(RowIndex, value);
+                    OnCommonChange();
                 }
             }
-
-            base.DetachEditingControl();
-        }
-
-        /// <summary>
-        /// Custom implementation of the InitializeEditingControl function. This function is called by the DataGridView control 
-        /// at the beginning of an editing session. It makes sure that the properties of the KryptonTextBox editing control are 
-        /// set according to the cell properties.
-        /// </summary>
-        public override void InitializeEditingControl(int rowIndex,
-                                                      object initialFormattedValue,
-                                                      DataGridViewCellStyle dataGridViewCellStyle) {
-            base.InitializeEditingControl(rowIndex, initialFormattedValue, dataGridViewCellStyle);
-
-            KryptonTextBox textBox = DataGridView.EditingControl as KryptonTextBox;
-            if (textBox != null) {
-                string initialFormattedValueStr = initialFormattedValue as string;
-                if (initialFormattedValueStr == null)
-                    textBox.Text = string.Empty;
-                else
-                    textBox.Text = initialFormattedValueStr;
-
-                DataGridViewTriState wrapMode = this.Style.WrapMode;
-                if (wrapMode == DataGridViewTriState.NotSet)
-                    wrapMode = this.OwningColumn.DefaultCellStyle.WrapMode;
-
-                textBox.WordWrap = textBox.Multiline = (wrapMode == DataGridViewTriState.True);
-
-                KryptonDataGridViewCustomColumn customColumn = OwningColumn as KryptonDataGridViewCustomColumn;
-                if (customColumn != null) {
-                    // Set this cell as the owner of the buttonspecs
-                    //textBox.ButtonSpecs.Clear();
-                    //textBox.ButtonSpecs.Owner = DataGridView.Rows[rowIndex].Cells[ColumnIndex];
-                    //foreach (ButtonSpec bs in textBoxColumn.ButtonSpecs) {
-                    //    bs.Click += new EventHandler(OnButtonClick);
-                    //    textBox.ButtonSpecs.Add(bs);
-                    //}
-                }
-            }
-        }
-
-        /// <summary>
-        /// Custom implementation of the PositionEditingControl method called by the DataGridView control when it
-        /// needs to relocate and/or resize the editing control.
-        /// </summary>
-        public override void PositionEditingControl(bool setLocation,
-                                                    bool setSize,
-                                                    Rectangle cellBounds,
-                                                    Rectangle cellClip,
-                                                    DataGridViewCellStyle cellStyle,
-                                                    bool singleVerticalBorderAdded,
-                                                    bool singleHorizontalBorderAdded,
-                                                    bool isFirstDisplayedColumn,
-                                                    bool isFirstDisplayedRow) {
-            Rectangle editingControlBounds = PositionEditingPanel(cellBounds, cellClip, cellStyle,
-                                                                  singleVerticalBorderAdded, singleHorizontalBorderAdded,
-                                                                  isFirstDisplayedColumn, isFirstDisplayedRow);
-
-            editingControlBounds = GetAdjustedEditingControlBounds(editingControlBounds, cellStyle);
-            DataGridView.EditingControl.Location = new Point(editingControlBounds.X, editingControlBounds.Y);
-            DataGridView.EditingControl.Size = new Size(editingControlBounds.Width, editingControlBounds.Height);
         }
         #endregion
 
-        #region Protected
+        #region Protected Override
         /// <summary>
-        /// Customized implementation of the GetErrorIconBounds function in order to draw the potential 
-        /// error icon next to the up/down buttons and not on top of them.
+        /// Customized implementation of the GetFormattedValue function in order to include the decimal and thousand separator
+        /// characters in the formatted representation of the cell value.
         /// </summary>
-        protected override Rectangle GetErrorIconBounds(Graphics graphics, DataGridViewCellStyle cellStyle, int rowIndex) {
-            const int ButtonsWidth = 16;
-
-            Rectangle errorIconBounds = base.GetErrorIconBounds(graphics, cellStyle, rowIndex);
-            if (DataGridView.RightToLeft == RightToLeft.Yes)
-                errorIconBounds.X = errorIconBounds.Left + ButtonsWidth;
-            else
-                errorIconBounds.X = errorIconBounds.Left - ButtonsWidth;
-
-            return errorIconBounds;
+        protected override object GetFormattedValue(object value, int rowIndex, ref DataGridViewCellStyle cellStyle,
+            TypeConverter valueTypeConverter, TypeConverter formattedValueTypeConverter,
+            DataGridViewDataErrorContexts context) {
+            if(value is byte[]) {
+                byte[] firstBytes = new byte[128];
+                byte[] bytes = value as byte[];
+                int count = Math.Min(bytes.Length, firstBytes.Length);
+                Array.Copy(bytes, firstBytes, count);
+                return BitConverter.ToString(firstBytes, 0, count).Replace("-", " ");
+            }
+            return base.GetFormattedValue(value, rowIndex, ref cellStyle, valueTypeConverter,
+                formattedValueTypeConverter, context);
         }
 
         /// <summary>
-        /// Custom implementation of the GetPreferredSize function.
+        /// Called when the cell is clicked.
         /// </summary>
-        protected override Size GetPreferredSize(Graphics graphics, DataGridViewCellStyle cellStyle, int rowIndex, Size constraintSize) {
-            if (DataGridView == null)
-                return new Size(-1, -1);
-
-            Size preferredSize = base.GetPreferredSize(graphics, cellStyle, rowIndex, constraintSize);
-            if (constraintSize.Width == 0) {
-                const int ButtonsWidth = 16; // Account for the width of the up/down buttons.
-                const int ButtonMargin = 8;  // Account for some blank pixels between the text and buttons.
-                preferredSize.Width += ButtonsWidth + ButtonMargin;
+        /// <param name="e">
+        /// The event arguments.
+        /// </param>
+        protected override void OnClick(DataGridViewCellEventArgs e) {
+            base.OnClick(e);
+            Form editor = null;
+            // If the user has provided a custom editor type, use that instead of the default
+            // form.
+            if (_editorType != null)
+                editor = Activator.CreateInstance(_editorType) as Form;
+            else
+                editor = new ByteViewerForm();
+            // We re-use the Tag property as input/output mechanism, so we don't have to create
+            // a new interface just for that. Kind of a hack, I know.
+            editor.Tag = Value;
+            if(editor.ShowDialog(DataGridView) == DialogResult.OK) {
+                object result = editor.Tag;
+                Value = result;
             }
-
-            return preferredSize;
         }
         #endregion
 
         #region Private
-        private void OnButtonClick(object sender, EventArgs e) {
-            KryptonDataGridViewCustomColumn customColumn = OwningColumn as KryptonDataGridViewCustomColumn;
-            DataGridViewButtonSpecClickEventArgs args = new DataGridViewButtonSpecClickEventArgs(customColumn, this, (ButtonSpecAny)sender);
-            customColumn.PerfomButtonSpecClick(args);
-        }
-
-        private KryptonDataGridViewCustomEditingControl EditingTextBox {
-            get { return DataGridView.EditingControl as KryptonDataGridViewCustomEditingControl; }
-        }
-
-        private Rectangle GetAdjustedEditingControlBounds(Rectangle editingControlBounds,
-                                                          DataGridViewCellStyle cellStyle) {
-            // Adjust the vertical location of the editing control:
-            int preferredHeight = DataGridView.EditingControl.GetPreferredSize(new Size(editingControlBounds.Width, 10000)).Height;
-            if (preferredHeight < editingControlBounds.Height) {
-                switch (cellStyle.Alignment) {
-                    case DataGridViewContentAlignment.MiddleLeft:
-                    case DataGridViewContentAlignment.MiddleCenter:
-                    case DataGridViewContentAlignment.MiddleRight:
-                        editingControlBounds.Y += (editingControlBounds.Height - preferredHeight) / 2;
-                        break;
-                    case DataGridViewContentAlignment.BottomLeft:
-                    case DataGridViewContentAlignment.BottomCenter:
-                    case DataGridViewContentAlignment.BottomRight:
-                        editingControlBounds.Y += editingControlBounds.Height - preferredHeight;
-                        break;
-                }
-            }
-
-            return editingControlBounds;
-        }
-
         private void OnCommonChange() {
             if (DataGridView != null && !DataGridView.IsDisposed && !DataGridView.Disposing) {
                 if (RowIndex == -1)
@@ -1351,218 +1228,14 @@ namespace ComponentFactory.Krypton.Toolkit
                     DataGridView.UpdateCellValue(ColumnIndex, RowIndex);
             }
         }
+        #endregion
 
-        private bool OwnsEditingTextBox(int rowIndex) {
-            if (rowIndex == -1 || DataGridView == null)
-                return false;
-
-            KryptonDataGridViewCustomEditingControl control = DataGridView.EditingControl as KryptonDataGridViewCustomEditingControl;
-            return (control != null) && (rowIndex == ((IDataGridViewEditingControl)control).EditingControlRowIndex);
-        }
-
-        private static bool PartPainted(DataGridViewPaintParts paintParts, DataGridViewPaintParts paintPart) {
-            return (paintParts & paintPart) != 0;
+        #region Internal
+        internal void SetEditorType(int rowIndex, Type editorType) {
+            _editorType = editorType;
         }
         #endregion
     }
-
-    /// <summary>
-    /// Defines the editing control for the DataGridViewCustomCell custom cell type.
-    /// </summary>
-    [ToolboxItem(false)]
-    public class KryptonDataGridViewCustomEditingControl : KryptonTextBox,
-                                                            IDataGridViewEditingControl {
-        #region Instance Fields
-        private DataGridView _dataGridView;
-        private bool _valueChanged;
-        private int _rowIndex;
-        #endregion
-
-        #region Identity
-        /// <summary>
-        /// Initalize a new instance of the KryptonDataGridViewCustomEditingControl class.
-        /// </summary>
-        public KryptonDataGridViewCustomEditingControl() {
-            TabStop = false;
-            StateCommon.Border.Width = 0;
-            StateCommon.Border.Draw = InheritBool.False;
-            StateCommon.Content.Padding = new Padding(0);
-        }
-        #endregion
-
-        #region Public
-        /// <summary>
-        /// Property which caches the grid that uses this editing control
-        /// </summary>
-        public virtual DataGridView EditingControlDataGridView {
-            get { return _dataGridView; }
-            set { _dataGridView = value; }
-        }
-
-        /// <summary>
-        /// Property which represents the current formatted value of the editing control
-        /// </summary>
-        public virtual object EditingControlFormattedValue {
-            get { return GetEditingControlFormattedValue(DataGridViewDataErrorContexts.Formatting); }
-            set { Text = (string)value; }
-        }
-
-        /// <summary>
-        /// Property which represents the row in which the editing control resides
-        /// </summary>
-        public virtual int EditingControlRowIndex {
-            get { return _rowIndex; }
-            set { _rowIndex = value; }
-        }
-
-        /// <summary>
-        /// Property which indicates whether the value of the editing control has changed or not
-        /// </summary>
-        public virtual bool EditingControlValueChanged {
-            get { return _valueChanged; }
-            set { _valueChanged = value; }
-        }
-
-        /// <summary>
-        /// Property which determines which cursor must be used for the editing panel, i.e. the parent of the editing control.
-        /// </summary>
-        public virtual Cursor EditingPanelCursor {
-            get { return Cursors.Default; }
-        }
-
-        /// <summary>
-        /// Property which indicates whether the editing control needs to be repositioned when its value changes.
-        /// </summary>
-        public virtual bool RepositionEditingControlOnValueChange {
-            get { return false; }
-        }
-
-        /// <summary>
-        /// Method called by the grid before the editing control is shown so it can adapt to the provided cell style.
-        /// </summary>
-        public virtual void ApplyCellStyleToEditingControl(DataGridViewCellStyle dataGridViewCellStyle) {
-            StateCommon.Content.Font = dataGridViewCellStyle.Font;
-            StateCommon.Content.Color1 = dataGridViewCellStyle.ForeColor;
-            StateCommon.Back.Color1 = dataGridViewCellStyle.BackColor;
-            TextAlign = KryptonDataGridViewNumericUpDownCell.TranslateAlignment(dataGridViewCellStyle.Alignment);
-        }
-
-        /// <summary>
-        /// Method called by the grid on keystrokes to determine if the editing control is interested in the key or not.
-        /// </summary>
-        public virtual bool EditingControlWantsInputKey(Keys keyData, bool dataGridViewWantsInputKey) {
-            switch (keyData & Keys.KeyCode) {
-                case Keys.Right: {
-                        TextBox textBox = Controls[0] as TextBox;
-                        if (textBox != null) {
-                            // If the end of the selection is at the end of the string, let the DataGridView treat the key message
-                            if ((RightToLeft == RightToLeft.No && !(textBox.SelectionLength == 0 && textBox.SelectionStart == textBox.Text.Length)) ||
-                                (RightToLeft == RightToLeft.Yes && !(textBox.SelectionLength == 0 && textBox.SelectionStart == 0))) {
-                                return true;
-                            }
-                        }
-                        break;
-                    }
-                case Keys.Left: {
-                        TextBox textBox = Controls[0] as TextBox;
-                        if (textBox != null) {
-                            // If the end of the selection is at the begining of the string or if the entire text is selected 
-                            // and we did not start editing, send this character to the dataGridView, else process the key message
-                            if ((RightToLeft == RightToLeft.No && !(textBox.SelectionLength == 0 && textBox.SelectionStart == 0)) ||
-                                (RightToLeft == RightToLeft.Yes && !(textBox.SelectionLength == 0 && textBox.SelectionStart == textBox.Text.Length))) {
-                                return true;
-                            }
-                        }
-                        break;
-                    }
-                case Keys.Down:
-                case Keys.Up:
-                    return true;
-                case Keys.Home:
-                case Keys.End: {
-                        // Let the grid handle the key if the entire text is selected.
-                        TextBox textBox = Controls[0] as TextBox;
-                        if (textBox != null) {
-                            if (textBox.SelectionLength != textBox.Text.Length) {
-                                return true;
-                            }
-                        }
-                        break;
-                    }
-                case Keys.Delete: {
-                        // Let the grid handle the key if the carret is at the end of the text.
-                        TextBox textBox = Controls[0] as TextBox;
-                        if (textBox != null) {
-                            if (textBox.SelectionLength > 0 ||
-                                textBox.SelectionStart < textBox.Text.Length) {
-                                return true;
-                            }
-                        }
-                        break;
-                    }
-            }
-
-            return !dataGridViewWantsInputKey;
-        }
-
-        /// <summary>
-        /// Returns the current value of the editing control.
-        /// </summary>
-        public virtual object GetEditingControlFormattedValue(DataGridViewDataErrorContexts context) {
-            return Text;
-        }
-
-        /// <summary>
-        /// Called by the grid to give the editing control a chance to prepare itself for the editing session.
-        /// </summary>
-        public virtual void PrepareEditingControlForEdit(bool selectAll) {
-            TextBox textBox = Controls[0] as TextBox;
-            if (textBox != null) {
-                if (selectAll)
-                    textBox.SelectAll();
-                else
-                    textBox.SelectionStart = textBox.Text.Length;
-            }
-        }
-        #endregion
-
-        #region Protected
-        /// <summary>
-        /// Listen to the TextChanged notification to forward the change to the grid.
-        /// </summary>
-        protected override void OnTextChanged(EventArgs e) {
-            base.OnTextChanged(e);
-
-            //            if (Focused)
-            NotifyDataGridViewOfValueChange();
-        }
-
-        /// <summary>
-        /// A few keyboard messages need to be forwarded to the inner textbox of the
-        /// KryptonNumericUpDown control so that the first character pressed appears in it.
-        /// </summary>
-        protected override bool ProcessKeyEventArgs(ref Message m) {
-            TextBox textBox = Controls[0] as TextBox;
-            if (textBox != null) {
-                PI.SendMessage(textBox.Handle, m.Msg, m.WParam, m.LParam);
-                return true;
-            }
-
-            return base.ProcessKeyEventArgs(ref m);
-        }
-        #endregion
-
-        #region Private
-        private void NotifyDataGridViewOfValueChange() {
-            if (!_valueChanged) {
-                _valueChanged = true;
-                _dataGridView.NotifyCurrentCellDirty(true);
-            }
-        }
-        #endregion
-    }
-
-    /// CUSTOM TEST END
 
     /// <summary>
     /// Hosts a collection of KryptonDataGridViewCheckBoxCell cells.
