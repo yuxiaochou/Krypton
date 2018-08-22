@@ -34,14 +34,15 @@ namespace ComponentFactory.Krypton.Toolkit {
             base.OnLoad(e);
             // We re-use the Tag property as input/output mechanism, so we don't have to create
             // a new interface just for that. Kind of a hack, I know.
-            var bytes = Tag as byte[];
-            if (bytes != null)
+            if (Tag is byte[] bytes)
                 byteViewer.SetBytes(bytes);
         }
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        /// <param name="disposing">
+        /// true if managed resources should be disposed; otherwise, false.
+        /// </param>
         protected override void Dispose(bool disposing) {
             if (disposing && (components != null)) {
                 components.Dispose();
@@ -52,7 +53,7 @@ namespace ComponentFactory.Krypton.Toolkit {
 
         #region Private
         private void OnCheckedButtonChanged(object sender, EventArgs e) {
-            KryptonCheckSet checkset = (KryptonCheckSet)sender; 
+            KryptonCheckSet checkset = (KryptonCheckSet)sender;
             DisplayMode mode;
             switch (checkset.CheckedButton.Text) {
                 case "ANSI":
@@ -67,7 +68,7 @@ namespace ComponentFactory.Krypton.Toolkit {
                     break;
             }
             // Sets the display mode.
-            if(byteViewer != null && byteViewer.GetDisplayMode() != mode)
+            if (byteViewer != null && byteViewer.GetDisplayMode() != mode)
                 byteViewer.SetDisplayMode(mode);
         }
 
@@ -78,13 +79,11 @@ namespace ComponentFactory.Krypton.Toolkit {
                 Filter = "All Files (*.*)|*.*"
             };
             if (sfd.ShowDialog(this) == DialogResult.OK) {
-                var bytes = Tag as byte[];
-                if (bytes != null) {
+                if (Tag is byte[] bytes)
                     File.WriteAllBytes(sfd.FileName, bytes);
-                    // FIXME: string literal.
-                    KryptonMessageBox.Show($"Data exported to {sfd.FileName}", "Data Export",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                // FIXME: string literal.
+                KryptonMessageBox.Show($"Data exported to {sfd.FileName}", "Data Export",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

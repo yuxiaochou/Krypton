@@ -12,22 +12,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Drawing.Drawing2D;
-using System.Data;
 using System.Text;
 using System.Windows.Forms;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Globalization;
-using System.Threading;
-using Microsoft.Win32;
+using System.Text.RegularExpressions;
 
-namespace ComponentFactory.Krypton.Toolkit
-{
+namespace ComponentFactory.Krypton.Toolkit {
     /// <summary>
     /// Collection for managing ButtonSpecAny instances.
     /// </summary>
@@ -1188,7 +1181,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 byte[] bytes = value as byte[];
                 int count = Math.Min(bytes.Length, firstBytes.Length);
                 Array.Copy(bytes, firstBytes, count);
-                return BitConverter.ToString(firstBytes, 0, count).Replace("-", " ");
+                string strval = BitConverter.ToString(firstBytes, 0, count).Replace("-", " ");
+                return Regex.Replace(strval, "(.{23})", "$1" + Environment.NewLine);
             }
             return base.GetFormattedValue(value, rowIndex, ref cellStyle, valueTypeConverter,
                 formattedValueTypeConverter, context);
@@ -3953,7 +3947,7 @@ namespace ComponentFactory.Krypton.Toolkit
             // By default, the base implementation converts the Decimal 1234.5 into the string "1234.5"
             object formattedValue = base.GetFormattedValue(value, rowIndex, ref cellStyle, valueTypeConverter, formattedValueTypeConverter, context);
             string formattedNumber = formattedValue as string;
-            if (!string.IsNullOrEmpty(formattedNumber) && value != null)
+            if (!string.IsNullOrEmpty(formattedNumber) && value != null && value != DBNull.Value) 
             {
                 Decimal unformattedDecimal = System.Convert.ToDecimal(value);
                 Decimal formattedDecimal = System.Convert.ToDecimal(formattedNumber);
