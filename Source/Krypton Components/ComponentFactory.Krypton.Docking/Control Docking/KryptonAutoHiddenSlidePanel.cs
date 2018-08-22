@@ -39,7 +39,7 @@ namespace ComponentFactory.Krypton.Docking
     {
         #region Static Fields
         private static readonly int SLIDE_MINIMUM = 27;
-        private static readonly int SLIDE_DISTANCE = 16;
+        private static readonly int SLIDE_DISTANCE = int.MaxValue;
         private static readonly int SLIDE_INTERVAL = 15;
         private static readonly int CLIENT_MINIMUM = 22;
         private static readonly int DISMISS_INTERVAL = 300;
