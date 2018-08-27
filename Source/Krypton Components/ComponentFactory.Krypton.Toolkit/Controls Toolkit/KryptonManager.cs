@@ -649,6 +649,8 @@ namespace ComponentFactory.Krypton.Toolkit
                     return RenderSparkle;
                 case RendererMode.Office2007:
                     return RenderOffice2007;
+                case RendererMode.Office2010:
+                    return RenderOffice2010;
                 case RendererMode.Professional:
                     return RenderProfessional;
                 case RendererMode.Standard:

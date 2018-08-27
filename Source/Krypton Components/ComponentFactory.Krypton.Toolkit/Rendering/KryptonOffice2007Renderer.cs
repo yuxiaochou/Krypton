@@ -342,28 +342,28 @@ namespace ComponentFactory.Krypton.Toolkit
             Rectangle checkBox = e.ImageRectangle;
 
             // Make the border of the check box 1 pixel bigger on all sides, as a minimum
-            checkBox.Inflate(1, 1);
+            checkBox.Inflate(2, 2);
 
             // Can we extend upwards?
-            if (checkBox.Top > _checkInset)
-            {
-                int diff = checkBox.Top - _checkInset;
-                checkBox.Y -= diff;
-                checkBox.Height += diff;
-            }
+            //if (checkBox.Top > _checkInset)
+            //{
+            //    int diff = checkBox.Top - _checkInset;
+            //    checkBox.Y -= diff;
+            //    checkBox.Height += diff;
+            //}
 
-            // Can we extend downwards?
-            if (checkBox.Height <= (e.Item.Bounds.Height - (_checkInset * 2)))
-            {
-                int diff = e.Item.Bounds.Height - (_checkInset * 2) - checkBox.Height;
-                checkBox.Height += diff;
-            }
+            //// Can we extend downwards?
+            //if (checkBox.Height <= (e.Item.Bounds.Height - (_checkInset * 2)))
+            //{
+            //    int diff = e.Item.Bounds.Height - (_checkInset * 2) - checkBox.Height;
+            //    checkBox.Height += diff;
+            //}
 
             // Drawing with anti aliasing to create smoother appearance
             using (AntiAlias aa = new AntiAlias(e.Graphics))
             {
                 // Create border path for the check box
-                using (GraphicsPath borderPath = CreateBorderPath(checkBox, _cutMenuItemBack))
+                using (GraphicsPath borderPath = CreateBorderPath(checkBox, /*_cutMenuItemBack*/0))
                 {
                     // Fill the background in a solid color
                     using (SolidBrush fillBrush = new SolidBrush(KCT.CheckBackground))
@@ -1457,8 +1457,10 @@ namespace ComponentFactory.Krypton.Toolkit
             int y = rect.Y + rect.Height / 2;
 
             GraphicsPath path = new GraphicsPath();
-            path.AddLine(x - 4, y, x - 2, y + 4);
-            path.AddLine(x - 2, y + 4, x + 3, y - 5);
+            //path.AddLine(x - 4, y, x - 2, y + 4);
+            //path.AddLine(x - 2, y + 4, x + 3, y - 5);
+            path.AddLine(x - 4, y - 1, x - 2, y - 1 + 4);
+            path.AddLine(x - 2, y - 1 + 4, x + 4, y - 5);
             return path;
         }
 
