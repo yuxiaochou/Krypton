@@ -82,6 +82,8 @@ namespace ComponentFactory.Krypton.Toolkit
                                              new Pair(PaletteBackStyle.PanelAlternate,              "Panel - Alternate"),
                                              new Pair(PaletteBackStyle.PanelRibbonInactive,         "Panel - Ribbon Inactive"),
                                              new Pair(PaletteBackStyle.PanelCustom1,                "Panel - Custom1"),
+                                             new Pair(PaletteBackStyle.PanelCustom2,                "Panel - Custom2"),
+                                             new Pair(PaletteBackStyle.PanelCustom3,                "Panel - Custom3"),
                                              new Pair(PaletteBackStyle.SeparatorLowProfile,         "Separator - Low Profile"),
                                              new Pair(PaletteBackStyle.SeparatorHighProfile,        "Separator - High Profile"),
                                              new Pair(PaletteBackStyle.SeparatorHighInternalProfile,"Separator - High Internal Profile"),

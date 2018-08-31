@@ -4760,6 +4760,10 @@ namespace ComponentFactory.Krypton.Toolkit
                     return GetPalettePanel(PanelStyles.PanelRibbonInactive, state);
                 case PaletteBackStyle.PanelCustom1:
                     return GetPalettePanel(PanelStyles.PanelCustom1, state);
+                case PaletteBackStyle.PanelCustom2:
+                    return GetPalettePanel(PanelStyles.PanelCustom2, state);
+                case PaletteBackStyle.PanelCustom3:
+                    return GetPalettePanel(PanelStyles.PanelCustom3, state);
                 case PaletteBackStyle.SeparatorLowProfile:
                     return GetPaletteBackSeparator(SeparatorStyles.SeparatorLowProfile, state);
                 case PaletteBackStyle.SeparatorHighProfile:

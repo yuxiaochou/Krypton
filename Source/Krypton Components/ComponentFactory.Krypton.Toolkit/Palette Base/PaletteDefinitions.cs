@@ -3003,6 +3003,16 @@ namespace ComponentFactory.Krypton.Toolkit
         PanelCustom1,
 
         /// <summary>
+        /// Specifies a background style appropriate for the second custom panel style.
+        /// </summary>
+        PanelCustom2,
+
+        /// <summary>
+        /// Specifies a background style appropriate for the third custom panel style.
+        /// </summary>
+        PanelCustom3,
+
+        /// <summary>
         /// Specifies a background style appropriate for a low profile separator style.
         /// </summary>
         SeparatorLowProfile,

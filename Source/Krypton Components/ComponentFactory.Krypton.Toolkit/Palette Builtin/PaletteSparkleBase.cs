@@ -336,6 +336,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelAlternate:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.SeparatorHighInternalProfile:
                 case PaletteBackStyle.SeparatorHighProfile:
                 case PaletteBackStyle.SeparatorLowProfile:
@@ -421,6 +423,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelClient:
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.ControlGroupBox:
                 case PaletteBackStyle.SeparatorLowProfile:
                 case PaletteBackStyle.SeparatorCustom1:
@@ -740,6 +744,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelClient:
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.ControlGroupBox:
                 case PaletteBackStyle.SeparatorLowProfile:
                 case PaletteBackStyle.SeparatorCustom1:
@@ -1086,6 +1092,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelAlternate:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.ControlClient:
                 case PaletteBackStyle.ControlAlternate:
                 case PaletteBackStyle.ControlGroupBox:
@@ -1224,6 +1232,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelAlternate:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.GridBackgroundList:
                 case PaletteBackStyle.GridBackgroundSheet:
                 case PaletteBackStyle.GridBackgroundCustom1:
@@ -1310,6 +1320,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelAlternate:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.SeparatorLowProfile:
                 case PaletteBackStyle.SeparatorHighInternalProfile:
                 case PaletteBackStyle.SeparatorHighProfile:
@@ -1406,6 +1418,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelAlternate:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.SeparatorLowProfile:
                 case PaletteBackStyle.SeparatorHighInternalProfile:
                 case PaletteBackStyle.SeparatorHighProfile:
@@ -1502,6 +1516,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelAlternate:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.SeparatorLowProfile:
                 case PaletteBackStyle.SeparatorHighInternalProfile:
                 case PaletteBackStyle.SeparatorHighProfile:
@@ -1598,6 +1614,8 @@ namespace ComponentFactory.Krypton.Toolkit
                 case PaletteBackStyle.PanelRibbonInactive:
                 case PaletteBackStyle.PanelAlternate:
                 case PaletteBackStyle.PanelCustom1:
+                case PaletteBackStyle.PanelCustom2:
+                case PaletteBackStyle.PanelCustom3:
                 case PaletteBackStyle.SeparatorLowProfile:
                 case PaletteBackStyle.SeparatorHighInternalProfile:
                 case PaletteBackStyle.SeparatorHighProfile:
