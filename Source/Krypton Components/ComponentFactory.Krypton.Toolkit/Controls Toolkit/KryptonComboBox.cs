@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace ComponentFactory.Krypton.Toolkit
 {
@@ -810,6 +811,7 @@ namespace ComponentFactory.Krypton.Toolkit
         private bool _alwaysActive;
         private bool _allowButtonSpecToolTips;
         private int _cachedHeight;
+        private int _hoverIndex;
         #endregion
 
         #region Events
@@ -917,6 +919,13 @@ namespace ComponentFactory.Krypton.Toolkit
         [Description("Occurs when the KryptonComboBox text has changed.")]
         [Category("Behavior")]
         public event EventHandler TextUpdate;
+
+        /// <summary>
+        /// Occurs when the hovered selection changed.
+        /// </summary>
+        [Description("Occurs when the hovered selection changed.")]
+        [Category("Behavior")]
+        public event EventHandler<HoveredSelectionChangedEventArgs> HoveredSelectionChanged;
 
         /// <summary>
         /// Occurs when the mouse enters the control.
@@ -2332,6 +2341,15 @@ namespace ComponentFactory.Krypton.Toolkit
             if (TrackMouseLeave != null)
                 TrackMouseLeave(this, e);
         }
+
+        /// <summary>
+        /// Raises the HoveredSelectionChanged event.
+        /// </summary>
+        /// <param name="e">An EventArgs containing the event data.</param>
+        protected virtual void OnHoverSelectionChanged(HoveredSelectionChangedEventArgs e) {
+            if (HoveredSelectionChanged != null)
+                HoveredSelectionChanged(this, e);
+        }
         #endregion
 
         #region Protected Overrides
@@ -2850,8 +2868,17 @@ namespace ComponentFactory.Krypton.Toolkit
                     else
                     {
                         // If selected then show as a checked item
-                        if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                        if ((e.State & DrawItemState.Selected) == DrawItemState.Selected) {
                             buttonState = PaletteState.Tracking;
+                            if(_hoverIndex != e.Index) {
+                                _hoverIndex = e.Index;
+                                // Raise the Hover event
+                                HoveredSelectionChangedEventArgs ev =
+                                    new HoveredSelectionChangedEventArgs(e.Bounds, e.Index,
+                                        Items[e.Index]);
+                                OnHoverSelectionChanged(ev);
+                            }
+                        }
                     }
 
                     // Update the view with the calculated state
