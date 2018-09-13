@@ -159,6 +159,27 @@ namespace ComponentFactory.Krypton.Toolkit
             // Show it now!
             Show(screenRect, popupSize);
         }
+
+        /// <summary>
+        /// Show the tooltip popup at the specified screen position.
+        /// </summary>
+        /// <param name="screenPt">Screen point of cursor.</param>
+        /// <remarks>
+        /// <see cref="ShowCalculatingSize(Point)"/> is weird and centers the popup at the
+        /// specified point.
+        /// </remarks>
+        public void Show(Point screenPt) {
+            // Get the size the popup would like to be
+            Size popupSize = ViewManager.GetPreferredSize(Renderer, Size.Empty);
+
+            // Find the screen position the popup will be relative to
+            Rectangle screenRect = new Rectangle(screenPt.X,
+                                                 screenPt.Y - VERT_OFFSET,
+                                                 1, VERT_OFFSET * 2);
+
+            // Show it now!
+            Show(screenRect, popupSize);
+        }
         #endregion
 
         #region Protected

@@ -5075,7 +5075,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     public class KryptonDataGridViewComboBoxColumn : DataGridViewColumn, IIconColumn
     {
         #region Instance Fields
-        private StringCollection _items;
+        private List<object> _items;
         private AutoCompleteStringCollection _autoCompleteCustom;
         private DataGridViewColumnSpecCollection _buttonSpecs;
         private List<IconSpec> _iconSpecs;
@@ -5097,7 +5097,7 @@ namespace ComponentFactory.Krypton.Toolkit {
         {
             _buttonSpecs = new DataGridViewColumnSpecCollection(this);
             _iconSpecs = new List<IconSpec>();
-            _items = new StringCollection();
+            _items = new List<object>();
             _autoCompleteCustom = new AutoCompleteStringCollection();
         }
 
@@ -5123,15 +5123,10 @@ namespace ComponentFactory.Krypton.Toolkit {
         {
             KryptonDataGridViewComboBoxColumn cloned = base.Clone() as KryptonDataGridViewComboBoxColumn;
 
-            // Convert collection of strings to an array
-            string[] strings = new string[Items.Count];
-            for (int i = 0; i < strings.Length; i++)
-                strings[i] = Items[i];
-
-            cloned.Items.AddRange(strings);
+            cloned.Items.AddRange(Items);
 
             // Convert collection of strings to an array
-            strings = new string[AutoCompleteCustomSource.Count];
+            string[] strings = new string[AutoCompleteCustomSource.Count];
             for (int i = 0; i < strings.Length; i++)
                 strings[i] = AutoCompleteCustomSource[i];
 
@@ -5195,7 +5190,7 @@ namespace ComponentFactory.Krypton.Toolkit {
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         [Editor("System.Windows.Forms.Design.StringCollectionEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
         [Localizable(true)]
-        public StringCollection Items
+        public List<object> Items
         {
             get { return _items; }
         }
@@ -5846,13 +5841,8 @@ namespace ComponentFactory.Krypton.Toolkit {
                 KryptonDataGridViewComboBoxColumn comboColumn = OwningColumn as KryptonDataGridViewComboBoxColumn;
                 if (comboColumn != null)
                 {
-                    // Convert collection of strings to an array
-                    object[] strings = new object[comboColumn.Items.Count];
-                    for (int i = 0; i < strings.Length; i++)
-                        strings[i] = comboColumn.Items[i];
-
                     comboBox.Items.Clear();
-                    comboBox.Items.AddRange(strings);
+                    comboBox.Items.AddRange(comboColumn.Items.ToArray());
 
                     string[] autoAppend = new string[comboColumn.AutoCompleteCustomSource.Count];
                     for (int j = 0; j < autoAppend.Length; j++)
