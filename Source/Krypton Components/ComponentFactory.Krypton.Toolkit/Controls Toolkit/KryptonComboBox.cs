@@ -801,6 +801,8 @@ namespace ComponentFactory.Krypton.Toolkit
         private AutoCompleteSource _autoCompleteSource;
         private Padding _layoutPadding;
         private IntPtr _screenDC;
+        private ButtonSpecAny _toolTipSpec;
+        private VisualPopupToolTip _toolTip;
         private bool _initializing;
         private bool _initialized;
         private bool _firstTimePaint;
@@ -928,6 +930,13 @@ namespace ComponentFactory.Krypton.Toolkit
         public event EventHandler<HoveredSelectionChangedEventArgs> HoveredSelectionChanged;
 
         /// <summary>
+        /// Occurs when the <see cref="KryptonComboBox"/> wants to display a tooltip.
+        /// </summary>
+        [Description("Occurs when the KryptonComboBox wants to display a tooltip.")]
+        [Category("Behavior")]
+        public event EventHandler<ToolTipNeededEventArgs> ToolTipNeeded;
+
+        /// <summary>
         /// Occurs when the mouse enters the control.
         /// </summary>
         [Browsable(false)]
@@ -1016,6 +1025,10 @@ namespace ComponentFactory.Krypton.Toolkit
             _firstTimePaint = true;
             _autoCompleteMode = AutoCompleteMode.None;
             _autoCompleteSource = AutoCompleteSource.None;
+            _hoverIndex = -1;
+            _toolTipSpec = new ButtonSpecAny {
+                ToolTipStyle = LabelStyle.SuperTip,
+            };
 
             // Create storage properties
             _buttonSpecs = new ComboBoxButtonSpecCollection(this);
@@ -2349,6 +2362,20 @@ namespace ComponentFactory.Krypton.Toolkit
         protected virtual void OnHoverSelectionChanged(HoveredSelectionChangedEventArgs e) {
             if (HoveredSelectionChanged != null)
                 HoveredSelectionChanged(this, e);
+            // See if there is a tooltip to display for the new selection.
+            var args = new ToolTipNeededEventArgs(e.Index, e.Item);
+            OnToolTipNeeded(args);
+            if (!args.IsEmpty)
+                ShowToolTip(args, e.Bounds.Location);
+        }
+
+        /// <summary>
+        /// Raises the ToolTipNeeded event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnToolTipNeeded(ToolTipNeededEventArgs e) {
+            if (ToolTipNeeded != null)
+                ToolTipNeeded(this, e);
         }
         #endregion
 
@@ -3060,6 +3087,7 @@ namespace ComponentFactory.Krypton.Toolkit
         private void OnComboBoxDropDown(object sender, EventArgs e)
         {
             _comboBox.Dropped = true;
+            _hoverIndex = -1;
             Refresh();
             OnDropDown(e);
         }
@@ -3201,6 +3229,29 @@ namespace ComponentFactory.Krypton.Toolkit
 
             // Not showing a popup page any more
             _visualPopupToolTip = null;
+        }
+
+        VisualPopupToolTip GetToolTip() {
+            if (_toolTip != null && !_toolTip.IsDisposed)
+                return _toolTip;
+            var redirector = new PaletteRedirect(KryptonManager.CurrentGlobalPalette);
+            _toolTip = new VisualPopupToolTip(redirector,
+                new ButtonSpecToContent(redirector, _toolTipSpec), KryptonManager
+                    .CurrentGlobalPalette.GetRenderer());
+            return _toolTip;
+        }
+
+        void ShowToolTip(ToolTipNeededEventArgs e, Point location) {
+            _toolTipSpec.ToolTipTitle = e.Title;
+            _toolTipSpec.ToolTipBody = e.Body;
+            _toolTipSpec.ToolTipImage = e.Icon;
+            var tip = GetToolTip();
+            // Needed to make Krypton update the tooltip data with the data of the spec.
+            tip.PerformNeedPaint(true);
+            var point = new Point(location.X + DropDownWidth, location.Y);
+            tip.Show(
+                PointToScreen(point)
+            );
         }
         #endregion
     }
