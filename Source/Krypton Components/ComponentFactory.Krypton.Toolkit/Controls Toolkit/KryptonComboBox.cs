@@ -2910,7 +2910,6 @@ namespace ComponentFactory.Krypton.Toolkit
 
                     // Update the view with the calculated state
                     _drawButton.ElementState = buttonState;
-
                     // Grab the raw device context for the graphics instance
                     IntPtr hdc = e.Graphics.GetHdc();
 
@@ -2936,14 +2935,39 @@ namespace ComponentFactory.Krypton.Toolkit
                                     {
                                         context.DisplayRectangle = drawBounds;
                                         _drawPanel.Layout(context);
-                                        _drawButton.Layout(context);
+                                        // This is a hack, but figuring out how to do this properly would take months of
+                                        // wading through Krypton source-code frankly...
+                                        if (_drawButton.CurrentPalette.PaletteContent is PaletteContent pc &&
+                                           Items[e.Index] is IColoredComboBoxItem colored) {
+                                            Font origNormalFont = _stateNormal.Item.Content.ShortText.Font;
+                                            Font origTrackingFont = _stateTracking.Item.Content.ShortText.Font;
+                                            if (colored.TextFont != null) {
+                                                _stateNormal.Item.Content.ShortText.Font = colored.TextFont;
+                                                _stateTracking.Item.Content.ShortText.Font = colored.TextFont;
+                                            }
+                                            _drawButton.Layout(context);
+                                            _stateNormal.Item.Content.ShortText.Font = origNormalFont;
+                                            _stateTracking.Item.Content.ShortText.Font = origTrackingFont;
+                                        } else {
+                                            _drawButton.Layout(context);
+                                        }
                                     }
-
+                                    
                                     // Ask the view element to actually draw
                                     using (RenderContext context = new RenderContext(this, g, drawBounds, Renderer))
                                     {
                                         _drawPanel.Render(context);
-                                        _drawButton.Render(context);
+                                        // This is a hack, but figuring out how to do this properly would take months of
+                                        // wading through Krypton source-code frankly...
+                                        if (_drawButton.CurrentPalette.PaletteContent is PaletteContent pc &&
+                                           Items[e.Index] is IColoredComboBoxItem colored) {
+                                            Color origColor = pc.ShortText.Color1;
+                                            pc.ShortText.Color1 = colored.TextColor;
+                                            _drawButton.Render(context);
+                                            pc.ShortText.Color1 = origColor;
+                                        } else {
+                                            _drawButton.Render(context);
+                                        }
                                     }
 
                                     // Now blit from the bitmap from the screen to the real dc
@@ -3254,5 +3278,10 @@ namespace ComponentFactory.Krypton.Toolkit
             );
         }
         #endregion
+    }
+
+    public interface IColoredComboBoxItem {
+        Color TextColor { get; set; }
+        Font TextFont { get; set; }
     }
 }
