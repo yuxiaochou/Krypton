@@ -5529,6 +5529,37 @@ namespace ComponentFactory.Krypton.Toolkit {
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether a cell's text uses the color from the respective text of the dropdown control.
+        /// </summary>
+        [Description("Indicates whether a cell's text uses the color from the respective text of the dropdown control.")]
+        [Category("Behavior")]
+        [DefaultValue(true)]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        [Browsable(true)]
+        public bool UseItemTextColor {
+            get {
+                if (ComboBoxCellTemplate == null)
+                    throw new InvalidOperationException("KryptonDataGridViewComboBoxCellTemplate cell template required");
+
+                return ComboBoxCellTemplate.UseItemTextColor;
+            }
+            set {
+                if (UseItemTextColor != value) {
+                    ComboBoxCellTemplate.UseItemTextColor = value;
+                    if (DataGridView != null) {
+                        DataGridViewRowCollection rows = DataGridView.Rows;
+                        int count = rows.Count;
+                        for (int i = 0; i < count; i++) {
+                            KryptonDataGridViewComboBoxCell cell = rows.SharedRow(i).Cells[Index] as KryptonDataGridViewComboBoxCell;
+                            if (cell != null)
+                                cell.UseItemTextColor = value;
+                        }
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Private
@@ -5572,6 +5603,7 @@ namespace ComponentFactory.Krypton.Toolkit {
         private AutoCompleteSource _autoCompleteSource;
         private string _displayMember;
         private string _valueMember;
+        private bool _useItemTextColor;
         #endregion
 
         #region Identity
@@ -5597,6 +5629,7 @@ namespace ComponentFactory.Krypton.Toolkit {
             _autoCompleteSource = AutoCompleteSource.None;
             _displayMember = string.Empty;
             _valueMember = string.Empty;
+            _useItemTextColor = true;
         }
 
         /// <summary>
@@ -5650,6 +5683,7 @@ namespace ComponentFactory.Krypton.Toolkit {
                 dataGridViewCell.AutoCompleteSource = AutoCompleteSource;
                 dataGridViewCell.DisplayMember = DisplayMember;
                 dataGridViewCell.ValueMember = ValueMember;
+                dataGridViewCell.UseItemTextColor = UseItemTextColor;
             }
             return dataGridViewCell;
         }
@@ -5799,6 +5833,22 @@ namespace ComponentFactory.Krypton.Toolkit {
                 }
             }
         }
+
+        /// <summary>
+        /// /// Gets or sets whether the cell's text uses the color from the respective text of the dropdown control.
+        /// </summary>
+        [DefaultValue(true)]
+        public bool UseItemTextColor {
+            get { return _useItemTextColor; }
+
+            set {
+                if (_useItemTextColor != value) {
+                    _useItemTextColor = value;
+                    OnCommonChange();
+                }
+            }
+        }
+
         /// <summary>
         /// DetachEditingControl gets called by the DataGridView control when the editing session is ending
         /// </summary>
@@ -5819,8 +5869,13 @@ namespace ComponentFactory.Krypton.Toolkit {
                         bs.Click -= new EventHandler(OnButtonClick);
                     comboBox.ButtonSpecs.Clear();
                 }
+                // Hijack to see if we need to remember which color to paint the cell's text in.
+                if (UseItemTextColor && comboBox.SelectedItem is IColoredComboBoxItem colored)
+                    Style.ForeColor = colored.TextColor;
+                else
+                    Style.ForeColor = Color.Empty;
             }
-
+            
             base.DetachEditingControl();
         }
 
