@@ -142,10 +142,10 @@ namespace ComponentFactory.Krypton.Toolkit {
     }
 
     /// <summary>
-    /// An interface that is implemented by KryptonDataGridViewColumn classes that support
-    /// column header icons.
+    /// An interface that is implemented by KryptonDataGridView column and cell classes that
+    /// support column header or cell icons.
     /// </summary>
-    public interface IIconColumn {
+    public interface IIconCell {
         /// <summary>
         /// Gets the list of icon specifications.
         /// </summary>
@@ -160,7 +160,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonTextBoxColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewTextBoxColumn), "ToolboxBitmaps.KryptonTextBox.bmp")]
-    public class KryptonDataGridViewTextBoxColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewTextBoxColumn : DataGridViewColumn, IIconCell
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
@@ -405,11 +405,11 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// <summary>
     /// Displays editable text information in a KryptonDataGridView control.
     /// </summary>
-    public class KryptonDataGridViewTextBoxCell : DataGridViewTextBoxCell
-    {
+    public class KryptonDataGridViewTextBoxCell : DataGridViewTextBoxCell, IIconCell {
         #region Instance Fields
         private bool _multiline;
         private bool _multilineStringEditor;
+        private List<IconSpec> _iconSpecs;
         #endregion
 
         #region Static Fields
@@ -434,6 +434,7 @@ namespace ComponentFactory.Krypton.Toolkit {
                 _paintingTextBox.StateCommon.Border.Draw = InheritBool.False;
                 _paintingTextBox.StateCommon.Back.Color1 = Color.Empty;
             }
+            _iconSpecs = new List<IconSpec>();
         }
 
         /// <summary>
@@ -443,6 +444,19 @@ namespace ComponentFactory.Krypton.Toolkit {
         {
             return "KryptonDataGridViewTextBoxCell { ColumnIndex=" + ColumnIndex.ToString(CultureInfo.CurrentCulture) +
                    ", RowIndex=" + RowIndex.ToString(CultureInfo.CurrentCulture) + " }";
+        }
+
+        /// <summary>
+        /// Creates an exact copy of this cell.
+        /// </summary>
+        /// <returns></returns>
+        public override object Clone() {
+            KryptonDataGridViewTextBoxCell cloned = base.Clone() as KryptonDataGridViewTextBoxCell;
+            foreach (IconSpec sp in IconSpecs)
+                cloned.IconSpecs.Add(sp.Clone() as IconSpec);
+            cloned.Multiline = Multiline;
+            cloned.MultilineStringEditor = MultilineStringEditor;
+            return cloned;
         }
 
         /// <summary>
@@ -510,6 +524,16 @@ namespace ComponentFactory.Krypton.Toolkit {
                     OnCommonChange();
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the collection of the icon specifications.
+        /// </summary>
+        [Category("Data")]
+        [Description("Set of extra icons to appear with control.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public List<IconSpec> IconSpecs {
+            get { return _iconSpecs; }
         }
 
         /// <summary>
@@ -955,7 +979,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// Hosts a collection of KryptonDataGridViewBinaryCell cells.
     /// </summary>
     [ToolboxBitmap(typeof(KryptonDataGridViewBinaryColumn), "ToolboxBitmaps.KryptonTextBox.bmp")]
-    public class KryptonDataGridViewBinaryColumn : DataGridViewColumn, IIconColumn {
+    public class KryptonDataGridViewBinaryColumn : DataGridViewColumn, IIconCell {
         #region Static Fields
         private static readonly Font _defaultFont = new Font("Consolas", 9.75f);
         #endregion
@@ -1235,7 +1259,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// Hosts a collection of KryptonDataGridViewCheckBoxCell cells.
     /// </summary>
     [ToolboxBitmap(typeof(KryptonDataGridViewCheckBoxColumn), "ToolboxBitmaps.KryptonCheckBox.bmp")]
-    public class KryptonDataGridViewCheckBoxColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewCheckBoxColumn : DataGridViewColumn, IIconCell
     {
         #region Instance Fields
         private List<IconSpec> _iconSpecs;
@@ -1796,7 +1820,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// Hosts a collection of KryptonDataGridViewButtonCell cells.
     /// </summary>
     [ToolboxBitmap(typeof(KryptonDataGridViewButtonColumn), "ToolboxBitmaps.KryptonButton.bmp")]
-    public class KryptonDataGridViewButtonColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewButtonColumn : DataGridViewColumn, IIconCell
     {
         #region Instance Fields
         private List<IconSpec> _iconSpecs;
@@ -2418,7 +2442,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// Hosts a collection of KryptonDataGridViewLinkColumn cells.
     /// </summary>
     [ToolboxBitmap(typeof(KryptonDataGridViewLinkColumn), "ToolboxBitmaps.KryptonLinkLabel.bmp")]
-    public class KryptonDataGridViewLinkColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewLinkColumn : DataGridViewColumn, IIconCell
     {
         #region Static Fields
         private MethodInfo _miColumnCommonChange;
@@ -3113,7 +3137,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonNumericUpDownColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewNumericUpDownColumn), "ToolboxBitmaps.KryptonNumericUpDown.bmp")]
-    public class KryptonDataGridViewNumericUpDownColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewNumericUpDownColumn : DataGridViewColumn, IIconCell
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
@@ -4429,7 +4453,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonDomainUpDownColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewDomainUpDownColumn), "ToolboxBitmaps.KryptonDomainUpDown.bmp")]
-    public class KryptonDataGridViewDomainUpDownColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewDomainUpDownColumn : DataGridViewColumn, IIconCell
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
@@ -5072,7 +5096,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonComboBoxColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewComboBoxColumn), "ToolboxBitmaps.KryptonComboBox.bmp")]
-    public class KryptonDataGridViewComboBoxColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewComboBoxColumn : DataGridViewColumn, IIconCell
     {
         #region Instance Fields
         private List<object> _items;
@@ -6291,7 +6315,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonDateTimePickerColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewDateTimePickerColumn), "ToolboxBitmaps.KryptonDateTimePicker.bmp")]
-    public class KryptonDataGridViewDateTimePickerColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewDateTimePickerColumn : DataGridViewColumn, IIconCell
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
@@ -8362,7 +8386,7 @@ namespace ComponentFactory.Krypton.Toolkit {
     /// </summary>
     [Designer("ComponentFactory.Krypton.Toolkit.KryptonMaskedTextBoxColumnDesigner, ComponentFactory.Krypton.Design, Version=4.5.0.0, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e")]
     [ToolboxBitmap(typeof(KryptonDataGridViewMaskedTextBoxColumn), "ToolboxBitmaps.KryptonMaskedTextBox.bmp")]
-    public class KryptonDataGridViewMaskedTextBoxColumn : DataGridViewColumn, IIconColumn
+    public class KryptonDataGridViewMaskedTextBoxColumn : DataGridViewColumn, IIconCell
     {
         #region Instance Fields
         private DataGridViewColumnSpecCollection _buttonSpecs;
