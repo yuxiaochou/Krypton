@@ -41,10 +41,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 *.suo
-Bin
 obj/
 packages/
-bin/
 .vs/
 *.csproj.user
 *.nupkg

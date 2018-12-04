@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KryptonButton Examples 2015", "KryptonButton Examples\KryptonButton Examples 2015.csproj", "{B50563E6-3123-49FC-816D-F873A0BCB789}"
 EndProject
@@ -100,6 +100,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KryptonTaskDialog Examples 2015", "KryptonTaskDialog Examples\KryptonTaskDialog Examples 2015.csproj", "{F5725FE2-F65B-4781-9037-9B4CEBDECAAB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KryptonInputBox Examples 2015", "KryptonInputBox Examples\KryptonInputBox Examples 2015.csproj", "{16DA7141-9737-4A0A-8A3D-F53775657C29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KryptonTreeView Examples 2015", "KryptonTreeView Examples\KryptonTreeView Examples 2015.csproj", "{F52C6F54-67E8-4713-85DD-1E05116CCDB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -601,8 +603,21 @@ Global
 		{16DA7141-9737-4A0A-8A3D-F53775657C29}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{16DA7141-9737-4A0A-8A3D-F53775657C29}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{16DA7141-9737-4A0A-8A3D-F53775657C29}.Release|x86.ActiveCfg = Release|Any CPU
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Debug|x86.ActiveCfg = Debug|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Debug|x86.Build.0 = Debug|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Release|Any CPU.ActiveCfg = Release|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Release|x86.ActiveCfg = Release|x86
+		{F52C6F54-67E8-4713-85DD-1E05116CCDB8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E482538-56F1-40D0-A9DB-239A3C877AD6}
 	EndGlobalSection
 EndGlobal
